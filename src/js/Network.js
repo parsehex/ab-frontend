@@ -426,8 +426,12 @@ Network.reconnect = function() {
 };
 
 Network.setup = function() {
+    const isLocal = game.playHost.includes("127.0.0.1") || game.playHost.includes("localhost");
+    
     if (DEVELOPMENT && game.customServerUrl) {
         currentSockUrl = game.customServerUrl;
+    } else if (isLocal) {
+        currentSockUrl = "ws://" + game.playHost + "/" + game.playPath;
     } else {
         currentSockUrl = "wss://" + game.playHost + "/" + game.playPath;
     }
