@@ -252,47 +252,30 @@ Games.logout = function() {
     window.location = window.location;
 };
 
-var refreshGamesData = function(callback, fromMainPage) {
-    let url = `https://${game.backendHost}/games`;
-    if (fromMainPage) {
-        url += '?main=1';
-    }
+var refreshGamesData = function (callback, fromMainPage) {
+	// load play count directly from ws url via http
+	gamesData = defaultGamesData;
+	const url = 'https://' + gamesData[0].games[0].host + '/';
 
-    $.ajax({
-        url: url,
-        dataType: 'json',
-        cache: false,
-        success: function(response) {
-            // Parse games data in response
-            try {
-                gamesData = JSON.parse(response.data)
-            } catch (e) {
-                return;
-            }
+	$.ajax({
+		url: url,
+		dataType: 'json',
+		cache: false,
+		success: function (response) {
+			// Parse games data in response
+			try {
+				res = JSON.parse(response.data);
+				Object.assign(gamesData[0].games[0], res);
+			} catch (e) {
+				return;
+			}
 
-            // Set flag from country code in response
-            if (game.myFlag == 'xx') {
-                game.myFlag = response.country;
-            }
-
-            // On protocol mismatch, reload the page
-            if (fromMainPage && game.protocol != response.protocol) {
-                if (window.location.hash !== '#reload') {
-                    Tools.ajaxPost(`https://${game.backendHost}/clienterror`, { type: 'protocol' }, function() {
-                        UI.showMessage('alert', '<span class="mainerror">Protocol update<br>Your client is being updated to the new version</span>', 30000);
-                        setTimeout(function() { window.location = '/?' + Tools.randomID(10) + '#reload' }, 5000);
-                    });
-                }
-                else {
-                    Tools.ajaxPost(`https://${game.backendHost}/clienterror`, { type: 'protocolretry' });
-                }
-            }
-
-            // Success callback
-            callback();
-        },
-        error: function() {}
-    })
+			callback();
+		},
+		error: function () {
+			callback();
+		},
+	});
 };
 
 var updatePlayersOnline = function() {
