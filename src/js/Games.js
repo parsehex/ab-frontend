@@ -253,9 +253,13 @@ Games.logout = function() {
 };
 
 var refreshGamesData = function (callback, fromMainPage) {
-	// load play count directly from ws url via http
+	// load play count directly from ws url via http endpoint
 	gamesData = defaultGamesData;
-	const url = 'https://' + gamesData[0].games[0].host + '/';
+	let url = 'https://' + gamesData[0].games[0].host + '/';
+    const isLocal = url.includes('localhost') || url.includes('127.0.0.1');
+    if (isLocal) {
+        url = 'http://' + gamesData[0].games[0].host + '/';
+    }
 
 	$.ajax({
 		url: url,
@@ -264,9 +268,9 @@ var refreshGamesData = function (callback, fromMainPage) {
 		success: function (response) {
 			// Parse games data in response
 			try {
-				res = JSON.parse(response.data);
-				Object.assign(gamesData[0].games[0], res);
+				Object.assign(gamesData[0].games[0], response);
 			} catch (e) {
+                console.log('Error parsing games data: ' + e);
 				return;
 			}
 
@@ -792,6 +796,10 @@ Games.performPing = function() {
         else {
             pingHosts[pingHost].num++;
             let url = `https://${pingHost}/ping`;
+            const isLocal = pingHost.includes('localhost') || pingHost.includes('127.0.0.1');
+            if (isLocal) {
+                url = `http://${pingHost}/ping`;
+            }
             performSinglePing(pingHost, url, function() {
                 performSinglePing(pingHost, url);
             });
