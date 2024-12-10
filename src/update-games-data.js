@@ -4,7 +4,14 @@ const path = require('path');
 console.log('---- ' + path.basename(__filename) + '\n');
 
 const gamesDataJsPath = path.join(__dirname, 'js', 'GamesData.js');
-const gamesJsonPath = path.join(__dirname, '..', 'games.json');
+const mainGamesJsonPath = path.join(__dirname, '..', 'games.json');
+const localGamesJsonPath = path.join(__dirname, 'games.json');
+const gamesJsonPath = mainGamesJsonPath || localGamesJsonPath;
+
+if (!fs.existsSync(gamesJsonPath)) {
+	console.error('games.json not found:', gamesJsonPath);
+	process.exit(1);
+}
 
 let data = [];
 
