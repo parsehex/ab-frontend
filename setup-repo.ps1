@@ -20,6 +20,7 @@ if (-Not (Test-Path -Path "node_modules")) {
 	npm install
 }
 
+# update-games-data relies on games.json
 if (-Not (Test-Path -Path "games.json")) {
 	Copy-Item -Path "games.json.example" -Destination "games.json"
 	Write-Output "games.json created - please run the following to edit:"

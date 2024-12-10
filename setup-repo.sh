@@ -19,6 +19,7 @@ if [ ! -d "node_modules" ]; then
 	npm install
 fi
 
+# update-games-data relies on games.json
 if [ ! -f "games.json" ]; then
 	cp "games.json.example" "games.json"
 	echo "games.json created - please run the following to edit:"
