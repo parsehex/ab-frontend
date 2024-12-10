@@ -4,7 +4,8 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "node src/update-version ; node src/update-games-data ; patch-package ; webpack"
+    "build": "node src/update-version ; node src/update-games-data ; patch-package ; webpack",
+    "start": "http-server dist -p 8000"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",
@@ -25,5 +26,8 @@
     "terser-webpack-plugin": "^2.2.1",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
   }
 }
