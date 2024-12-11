@@ -206,8 +206,8 @@ class Player {
         const isINF = 4 == game.gameType;
         if (isCTF) // blue/red
             var e = 1 == this.team ? "#4076E2" : "#EA4242";
-        else if (isINF) // green/yellow
-            e = 1 == this.team ? "#00FF00" : "#FFFF00";
+        else if (isINF) // yellow/green
+            e = 1 == this.team ? "#FFEC52" : "#00FF00";
         else
             e = this.team == game.myTeam ? "#FFFFFF" : "#FFEC52";
         return {
