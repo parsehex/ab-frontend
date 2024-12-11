@@ -202,8 +202,12 @@ class Player {
     }
 
     nameplateTextStyle() {
-        if (2 == game.gameType)
+        const isCTF = 2 == game.gameType;
+        const isINF = 4 == game.gameType;
+        if (isCTF) // blue/red
             var e = 1 == this.team ? "#4076E2" : "#EA4242";
+        else if (isINF) // green/yellow
+            e = 1 == this.team ? "#00FF00" : "#FFFF00";
         else
             e = this.team == game.myTeam ? "#FFFFFF" : "#FFEC52";
         return {
@@ -366,7 +370,7 @@ class Player {
         this.pos.x = ev.posX;
         this.pos.y = ev.posY;
         this.speed = Vector.zero();
-        if (this.me()) { 
+        if (this.me()) {
             UI.resetPowerups();
         }
         this.resetPowerups();
@@ -531,7 +535,7 @@ class Player {
     }
 
     updateLevel(packet) {
-        if (this.me()) { 
+        if (this.me()) {
             if (packet.type == 1) {
                 Games.showLevelUp(packet.level);
             }
@@ -636,20 +640,20 @@ class Player {
         this.hidden = false,
         this.timedout = false,
         this.visibilityUpdate();
-        if (this.me()) { 
-            UI.resetPowerups(); 
+        if (this.me()) {
+            UI.resetPowerups();
         }
         Tools.decodeUpgrades(this, e.upgrades);
         this.updatePowerups();
-        if (this.render || this.me()) { 
+        if (this.render || this.me()) {
             this.scale = 0;
             this.state.scaleLevel = 0;
         }
-        
+
         if (this.stealthed)  {
             this.unstealth();
         }
-        
+
         if (this.me()) {
             game.myType = this.type;
             game.spectatingID = null;
@@ -774,7 +778,7 @@ class Player {
                 if (this.energy >= 1) {
                     this.energy = 1;
                 }
-            
+
                 this.health += perLoopEffect * this.healthRegen;
                 if (this.health >= 1) {
                     this.health = 1;
@@ -997,7 +1001,7 @@ class Player {
         this.col.rotation = this.rot)
     }
 
-    isSpectating() {        
+    isSpectating() {
         return this.spectate;
     }
 }
