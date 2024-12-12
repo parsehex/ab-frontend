@@ -444,6 +444,9 @@ UI.scoreboardUpdate = function (msgData, msgRankings, maxScoreboard) {
         if (GameType.CTF == game.gameType) {
             playerNameClass = " team-" + player.team
         }
+        else if (GameType.INF == game.gameType) {
+            playerNameClass = " inf-team-" + player.team
+        }
 
         let placeCssClass = '';
         if (4 == (badgeHtml + "").length) {
@@ -691,6 +694,16 @@ UI.updateGameInfo = function() {
         html += `<span style="color: #4076E2">${counts.blueTeam}</span>`;
         html += '&nbsp;/&nbsp;';
         html += `<span style="color: #EA4242">${counts.redTeam}</span>`;
+        html += '&nbsp;/&nbsp;';
+        html += `${counts.spectators}`;
+        html += ')</span>';
+    }
+    else if (game.gameType === GameType.INF) {
+        // yellow/green instead of blue/red
+        html += '<span class="greyed">&nbsp;&nbsp;(';
+        html += `<span style="color: #FFEC52">${counts.blueTeam}</span>`;
+        html += '&nbsp;/&nbsp;';
+        html += `<span style="color: #00FF00">${counts.redTeam}</span>`;
         html += '&nbsp;/&nbsp;';
         html += `${counts.spectators}`;
         html += ')</span>';
@@ -1311,7 +1324,11 @@ UI.updateScore = function (scoreDetailedMsg) {
 
         let playerNameDivClass = '';
         if (scoreDetailedMsg.c == Network.SERVERPACKET.SCORE_DETAILED_CTF) {
-            playerNameDivClass += ` team-${player.team}`
+            if (game.gameType === GameType.CTF) {
+                playerNameDivClass += ` team-${player.team}`
+            } else if (game.gameType === GameType.INF) {
+                playerNameDivClass += ` inf-team-${player.team}`
+            }
         }
 
         let playerStatsDivClass = '';

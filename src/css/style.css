@@ -1935,6 +1935,13 @@ input:focus {
     color: #dc4f46
 }
 
+#scoreboard .line .nick.inf-team-1 {
+    color: #FFEC52
+}
+#scoreboard .line .nick.inf-team-2 {
+    color: #00FF00
+}
+
 #scoreboard .line .nick.spectating {
     color: #8c8c8c
 }
@@ -2442,6 +2449,13 @@ input:focus {
 
 #scoredetailed .item .name .team-2 {
     color: #dc4f46
+}
+
+#scoredetailed .item .name .inf-team-1 {
+    color: #FFEC52
+}
+#scoredetailed .item .name .inf-team-2 {
+    color: #00FF00
 }
 
 #scoredetailed .item .name .spectating {
