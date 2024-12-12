@@ -760,7 +760,8 @@ class Player {
         this.detectTimeout();
         this.visibilityUpdate();
 
-        if(! this.render) {
+        const isSurvivor = 4 == game.gameType && 1 == game.myTeam;
+        if(! this.render && ! isSurvivor) {
             this.health += timeFrac * this.healthRegen;
             if(this.health >= 1) {
                 this.health = 1;
@@ -779,9 +780,11 @@ class Player {
                     this.energy = 1;
                 }
 
-                this.health += perLoopEffect * this.healthRegen;
-                if (this.health >= 1) {
-                    this.health = 1;
+                if (!isSurvivor) {
+                    this.health += perLoopEffect * this.healthRegen;
+                    if (this.health >= 1) {
+                        this.health = 1;
+                    }
                 }
 
                 var speedDeltaAngle = -999;
@@ -901,11 +904,14 @@ class Player {
         }
         if (!this.culled) {
             if (this.render) {
-                if (!this.stealthed && this.health < .4) {
-                    Particles.planeDamage(this);
-                }
-                if (!this.stealthed && this.health < .2) {
-                    Particles.planeDamage(this);
+                const isSurvivor = 4 == game.gameType && 1 == game.myTeam;
+                if (!isSurvivor) {
+                    if (!this.stealthed && this.health < .4) {
+                        Particles.planeDamage(this);
+                    }
+                    if (!this.stealthed && this.health < .2) {
+                        Particles.planeDamage(this);
+                    }
                 }
                 if (this.boost) {
                     Particles.planeBoost(this, angleToDraw >= 0);
