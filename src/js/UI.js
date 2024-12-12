@@ -345,7 +345,10 @@ UI.scoreboardUpdate = function (msgData, msgRankings, maxScoreboard) {
                     livePlayerIdSet[player.id] = true;
                     if (null == minimapMobs[msgRankings[i].id]) {
                         var mobTextureName = "minimapMob";
-                        if (GameType.CTF == game.gameType && 1 == player.team) {
+                        if (
+                            (GameType.CTF == game.gameType || GameType.INF === game.gameType) &&
+                            1 == player.team
+                        ) {
                             mobTextureName = "minimapBlue";
                         }
                         minimapMobs[msgRankings[i].id] = {
