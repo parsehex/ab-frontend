@@ -4,12 +4,19 @@ const path = require('path');
 console.log('---- ' + path.basename(__filename) + '\n');
 
 const gamesDataJsPath = path.join(__dirname, 'js', 'GamesData.js');
-const mainGamesJsonPath = path.join(__dirname, '..', 'games.json');
-const localGamesJsonPath = path.join(__dirname, 'games.json');
-const gamesJsonPath = mainGamesJsonPath || localGamesJsonPath;
+const mainGamesJsonPath = path.join(__dirname, '..', 'games.json'); // airbattle-hosting/games.json
+const localGamesJsonPath = path.join(__dirname, 'games.json'); // ab-frontend/games.json
 
-if (!fs.existsSync(gamesJsonPath)) {
-	console.error('games.json not found:', gamesJsonPath);
+let gamesJsonPath;
+
+if (fs.existsSync(mainGamesJsonPath)) {
+	gamesJsonPath = mainGamesJsonPath;
+	console.log('Using games.json from airbattle-hosting');
+} else if (fs.existsSync(localGamesJsonPath)) {
+	gamesJsonPath = localGamesJsonPath;
+	console.log('Using games.json from ab-frontend');
+} else {
+	console.error('games.json not found:', mainGamesJsonPath, localGamesJsonPath);
 	process.exit(1);
 }
 
