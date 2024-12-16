@@ -4,8 +4,8 @@ const path = require('path');
 console.log('---- ' + path.basename(__filename) + '\n');
 
 const gamesDataJsPath = path.join(__dirname, 'js', 'GamesData.js');
-const mainGamesJsonPath = path.join(__dirname, '..', 'games.json'); // airbattle-hosting/games.json
-const localGamesJsonPath = path.join(__dirname, 'games.json'); // ab-frontend/games.json
+const mainGamesJsonPath = path.join(__dirname, '../..', 'games.json'); // airbattle-hosting/games.json
+const localGamesJsonPath = path.join(__dirname, '..', 'games.json'); // ab-frontend/games.json
 
 let gamesJsonPath;
 
