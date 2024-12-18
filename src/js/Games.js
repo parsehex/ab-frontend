@@ -995,6 +995,7 @@ Games.start = function(playerName, fromMainPage) {
 
     UI.gameStart(playerName, fromMainPage);
 
+    return;
     // Usage telemetry
     Tools.ajaxPost(`https://${game.backendHost}/enter`, {
         id: config.settings.id,
