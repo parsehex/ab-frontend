@@ -25,6 +25,9 @@ let data = [];
 try {
 	const jsonData = fs.readFileSync(gamesJsonPath, 'utf8');
 	data = JSON.parse(jsonData);
+	if (!Array.isArray(data) && typeof data === 'object') {
+		data = [data];
+	}
 } catch (err) {
 	console.error('Error reading games.json:', err);
 	process.exit(1);
