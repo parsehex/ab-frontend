@@ -255,10 +255,14 @@ Games.logout = function() {
 var refreshGamesData = function (callback, fromMainPage) {
 	// load play count directly from ws url via http endpoint
 	gamesData = defaultGamesData;
-	let url = 'https://' + gamesData[0].games[0].host + '/';
+    let firstGameHost = gamesData[0].games[0].host;
+    if (!firstGameHost) {
+        firstGameHost = window.location.host;
+    }
+	let url = 'https://' + firstGameHost + '/';
     const isLocal = url.includes('localhost') || url.includes('127.0.0.1');
     if (isLocal) {
-        url = 'http://' + gamesData[0].games[0].host + '/';
+        url = 'http://' + firstGameHost + '/';
     }
 
 	$.ajax({
@@ -795,6 +799,9 @@ Games.performPing = function() {
         }
         else {
             pingHosts[pingHost].num++;
+            if (!pingHost) {
+                pingHost = window.location.host;
+            }
             let url = `https://${pingHost}/ping`;
             const isLocal = pingHost.includes('localhost') || pingHost.includes('127.0.0.1');
             if (isLocal) {
@@ -955,7 +962,7 @@ Games.start = function(playerName, fromMainPage) {
         // Room
         let roomId = getSelectedRoomId();
         let regionGame = getGameByRegionAndRoom(game.playRegion, roomId);
-        game.playHost = regionGame.host;
+        game.playHost = regionGame.host || window.location.host;
         game.playPath = regionGame.path;
         game.roomNameShort = regionGame.nameShort;
         game.regionName = getRegionByName(game.playRegion).name;

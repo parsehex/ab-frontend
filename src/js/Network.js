@@ -426,14 +426,18 @@ Network.reconnect = function() {
 };
 
 Network.setup = function() {
-    const isLocal = game.playHost.includes("127.0.0.1") || game.playHost.includes("localhost");
-    
+    let playHost = game.playHost;
+    if (!playHost) {
+        playHost = window.location.host;
+    }
+    const isLocal = playHost.includes("127.0.0.1") || playHost.includes("localhost");
+
     if (DEVELOPMENT && game.customServerUrl) {
         currentSockUrl = game.customServerUrl;
     } else if (isLocal) {
-        currentSockUrl = "ws://" + game.playHost + "/" + game.playPath;
+        currentSockUrl = "ws://" + playHost + "/" + game.playPath;
     } else {
-        currentSockUrl = "wss://" + game.playHost + "/" + game.playPath;
+        currentSockUrl = "wss://" + playHost + "/" + game.playPath;
     }
     backupSock && backupSockIsConnected && backupSock.close(),
     (primarySock = new WebSocket(currentSockUrl)).binaryType = "arraybuffer",
