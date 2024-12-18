@@ -98,6 +98,7 @@ Tools.syncRemoteSettings = function() {
         var remoteSettingsJson = JSON.stringify(remoteSettings);
         if (remoteSettingsJson !== lastRemoteSettingsJson) {
             lastRemoteSettingsJson = remoteSettingsJson;
+            return;
             Tools.ajaxPost(
                 "https://" + game.backendHost + '/settings',
                 remoteSettingsJson,
@@ -506,6 +507,7 @@ Tools.handleError = function(e) {
             server = game.server.id;
         }
 
+        return;
         Tools.ajaxPost("https://" + game.backendHost + "/clienterror", {
             type: "runtime",
             error: JSON.stringify(e),
