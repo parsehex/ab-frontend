@@ -1050,9 +1050,11 @@ UI.showCommandReply = function(e) {
 };
 
 UI.updateHUD = function(e, t, n) {
+    const isSurvivor = game.gameType === 4 && n && n.team === 1;
     e = Tools.clamp(e, 0, 1),
-    t = Tools.clamp(t, 0, 1),
-    game.graphics.gui.hudHealth.rotation = -1.1 * (1 - e),
+    t = Tools.clamp(t, 0, 1);
+    if (game.graphics.gui.hudHealth.rotation > -1.1 * (1 - e) || !isSurvivor) // losing health or is
+        game.graphics.gui.hudHealth.rotation = -1.1 * (1 - e),
     game.graphics.gui.hudEnergy.rotation = Math.PI + 1.1 * (1 - t),
     game.graphics.gui.hudHealth.tint = e > .5 ? Tools.colorLerp(13487404, 2591785, 2 * (e - .5)) : Tools.colorLerp(12201261, 13487404, 2 * e);
     var r = 3374821;

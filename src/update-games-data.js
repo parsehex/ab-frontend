@@ -9,6 +9,10 @@ const localGamesJsonPath = path.join(__dirname, '..', 'games.json'); // ab-front
 
 let gamesJsonPath;
 
+// the way this should work:
+// ab-frontend has the only games.json.example file
+// when running setup for airbattle-hosting, the example file is copied to ab-frontend/games.json
+//   and that file is symlinked to airbattle-hosting/games.json
 if (fs.existsSync(mainGamesJsonPath)) {
 	gamesJsonPath = mainGamesJsonPath;
 	console.log('Using games.json from airbattle-hosting');
