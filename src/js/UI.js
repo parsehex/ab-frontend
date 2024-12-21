@@ -629,6 +629,9 @@ UI.onChatlineClick = function(event)
 
 
 UI.addChatLine = function(msg, text, msgType) {
+    // Infected mode uses teams 1 & 2
+    // If the player's id matches their team = Server player
+    const isInfectedMsg = game.gameType === 4 && msg.id === msg.team && text.indexOf("infected") !== -1;
     if (!ignoredPlayerIdSet[msg.id]) {
         chatLineId++;
         if (0 == msgType)
@@ -643,6 +646,10 @@ UI.addChatLine = function(msg, text, msgType) {
             s = -1
         }
         var o = $(o);
+        // if infected, make text green
+        if (isInfectedMsg) {
+            o.find('.text').removeClass('blue').addClass('green');
+        }
         o.click(UI.onChatlineClick);
         var c = "#chat-" + (chatLineId - config.maxChatLines);
         if ($(c).length && $(c).remove(),
