@@ -11,6 +11,9 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = {
   entry: {
+    'assets/extra.js': [
+      './src/js/extra.js'
+    ],
     'assets/engine.js': [
       './src/js/main.js'
     ],

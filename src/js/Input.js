@@ -1,3 +1,4 @@
+import { respawnHook } from './extra';
 import Vector from './Vector';
 import nipplejs from 'nipplejs';
 
@@ -227,6 +228,9 @@ Input.setup = function() {
 var onWindowKeyDown = function(event) {
     if (game.state == Network.STATE.PLAYING || game.state == Network.STATE.CONNECTING) {
         var keyCode = event.which;
+        
+        if (respawnHook(event)) return;
+        
         if (72 != keyCode && UI.hideHelp(),
         null != c && P(keyCode))
             event.preventDefault();
