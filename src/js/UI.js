@@ -646,7 +646,7 @@ UI.addChatLine = function(msg, text, msgType) {
             s = -1
         }
         var o = $(o);
-        // if infected, make text green
+        // Infected msg: make text green
         if (isInfectedMsg) {
             o.find('.text').removeClass('blue').addClass('green');
         }
