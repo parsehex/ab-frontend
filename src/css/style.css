@@ -1939,7 +1939,7 @@ input:focus {
     color: #FFEC52
 }
 #scoreboard .line .nick.inf-team-2 {
-    color: #00FF00
+    color: #78d07f
 }
 
 #scoreboard .line .nick.spectating {
@@ -2278,6 +2278,16 @@ input:focus {
     color: #be2829
 }
 
+#custom-msg .winner .player.yellow {
+    padding: 5px 14px 4px 14px;
+    color: #FFEC52
+}
+
+#custom-msg .winner .player.green {
+    padding: 5px 14px 4px 14px;
+    color: #78d07f
+}
+
 #custom-msg .winner .player .flag {
     position: absolute;
     top: 8px;
@@ -2455,7 +2465,7 @@ input:focus {
     color: #FFEC52
 }
 #scoredetailed .item .name .inf-team-2 {
-    color: #00FF00
+    color: #78d07f
 }
 
 #scoredetailed .item .name .spectating {

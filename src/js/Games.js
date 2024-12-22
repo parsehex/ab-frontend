@@ -1336,14 +1336,24 @@ Games.showBTRWin = function(info) {
  * SERVER_CUSTOM type 2 (CTF) message handler
  */
 Games.showCTFWin = function(info) {
+    // INF mode response: { w: 2, b: 0, t: 7 }
+    // w  = winning team (1 = blue, 2 = red)
+    // b  = bounty awarded to player
+
     // Only display if no other custom message is currently displayed
     if (!$('#custom-msg').length) {
         let html = '';
-        
+        let teamName = info.w == 1 ? 'BLUE TEAM' : 'RED TEAM';
+        let teamClass = info.w == 1 ? 'blue' : 'red';
+        if (game.gameType === GameType.INF) {
+            teamName = info.w == 1 ? 'SURVIVORS' : 'INFECTED';
+            teamClass = info.w == 1 ? 'yellow' : 'green';
+        }
+
         // Trophy, winning team, and bounty awarded to player
         html += '<div id="custom-msg" class="ctfwin">';
         html += '<div class="trophy"></div>';
-        html += '<div class="winner">' + (info.w == 1 ? '<div class="player blue">BLUE TEAM</div>' : '<div class="player red">RED TEAM</div>') + '</div>';
+        html += '<div class="winner"><div class="player ' + teamClass + '">' + teamName + '</div></div>';
         html += '<div class="bounty">+' + UI.escapeHTML(info.b) + ' BOUNTY</div></div>';
 
         // Display message and play sound
