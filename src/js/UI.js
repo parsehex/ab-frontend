@@ -713,7 +713,7 @@ UI.updateGameInfo = function() {
         html += '<span class="greyed">&nbsp;&nbsp;(';
         html += `<span style="color: #FFEC52">${counts.blueTeam}</span>`;
         html += '&nbsp;/&nbsp;';
-        html += `<span style="color: #00FF00">${counts.redTeam}</span>`;
+        html += `<span style="color: #78d07f">${counts.redTeam}</span>`;
         html += '&nbsp;/&nbsp;';
         html += `${counts.spectators}`;
         html += ')</span>';
