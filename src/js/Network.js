@@ -376,9 +376,9 @@ var isValidGameServerId = function(gameServerId) {
 };
 
 var showSwitchGameSuggestion = function(data) {
-    /* 
+    /*
        On the original Airmash servers, this was sent in a SERVER_MESSAGE packet, as HTML. Example:
-    
+
          Battle Royale: Goliath round starting in 1 minute<br><span class="button" onclick="Games.switchGame(&quot;btr1&quot;)">JOIN BTR #1</span>
     */
     if (data && data.message && data.button && isValidGameServerId(data.server)) {
@@ -427,14 +427,15 @@ Network.reconnect = function() {
 
 Network.setup = function() {
     let playHost = game.playHost;
-    if (!playHost) {
-        playHost = window.location.host;
-    }
-    const isLocal = playHost.includes("127.0.0.1") || playHost.includes("localhost");
+    const isServerLocal = playHost.includes("127.0.0.1") || playHost.includes("localhost");
+    const windowHost = window.location.host;
+    const isWindowLAN = windowHost.startsWith('192.168');
 
     if (DEVELOPMENT && game.customServerUrl) {
         currentSockUrl = game.customServerUrl;
-    } else if (isLocal) {
+    } else if (isServerLocal && isWindowLAN) {
+        currentSockUrl = "ws://" + windowHost + "/" + game.playPath;
+    } else if (isServerLocal) {
         currentSockUrl = "ws://" + playHost + "/" + game.playPath;
     } else {
         currentSockUrl = "wss://" + playHost + "/" + game.playPath;
@@ -461,7 +462,7 @@ Network.setup = function() {
         if (game.state !== Network.STATE.CONNECTING) {
             game.server = {};
             game.state = Network.STATE.CONNECTING;
-            if (lastReceivedError === false) { 
+            if (lastReceivedError === false) {
                 Network.reconnectMessage();
             }
         }
