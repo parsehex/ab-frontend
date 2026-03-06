@@ -1693,7 +1693,7 @@ UI.gameStart = function(playerName, isFirstTime) {
     if (isFirstTime) {
         $("#login-ui").remove();
         UI.show("#logosmall");
-        UI.show("#menu", true);
+        // UI.show("#menu", true);
         if (!config.mobile) {
                 UI.show("#chatbox");
         }

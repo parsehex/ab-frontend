@@ -3950,10 +3950,6 @@ only screen and (max-height:599px) and (orientation:landscape) {
         transform: scale(.8)
     }
 
-    #logosmall {
-        display: none !important
-    }
-
     #menu {
         left: 12px
     }

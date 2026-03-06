@@ -729,7 +729,7 @@ var updateGameSelector = function() {
 Games.closeGames = function() {
     if (gamesSelectorVisible) {
         UI.hide('#gameselector');
-        UI.show('#menu');
+        // UI.show('#menu');
         gamesSelectorVisible = false;
         Sound.UIClick();
     }
