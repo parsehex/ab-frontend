@@ -122,17 +122,14 @@ Games.setup = function() {
         if (!isGamesDataEmpty) {
             selectGameFromUrlHash();
             
-            // Auto-select the first region and game if none selected
-            if (!game.playRegion || !game.playRoom) {
-                game.playRegion = gamesData[0].id;
-                game.playRoom = gamesData[0].games[0].id;
-            }
+            game.playRegion = gamesData[0].id;
+            game.playRoom = gamesData[0].games[0].id;
             
             Games.updateRegion(false);
             Games.updateType(false);
             
             // Update the play button to have the game shortname
-            let selectedGame = getGameByRegionAndRoom(game.playRegion, game.playRoom);
+            let selectedGame = gamesData[0].games[0];
             if (selectedGame) {
                 $('#playbutton').html('PLAY ' + (selectedGame.nameShort || selectedGame.name || '').toUpperCase());
             }
