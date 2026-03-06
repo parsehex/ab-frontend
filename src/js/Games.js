@@ -121,8 +121,21 @@ Games.setup = function() {
         updatePlayersOnline();
         if (!isGamesDataEmpty) {
             selectGameFromUrlHash();
+            
+            // Auto-select the first region and game if none selected
+            if (!game.playRegion || !game.playRoom) {
+                game.playRegion = gamesData[0].id;
+                game.playRoom = gamesData[0].games[0].id;
+            }
+            
             Games.updateRegion(false);
             Games.updateType(false);
+            
+            // Update the play button to have the game shortname
+            let selectedGame = getGameByRegionAndRoom(game.playRegion, game.playRoom);
+            if (selectedGame) {
+                $('#playbutton').html('PLAY ' + (selectedGame.nameShort || selectedGame.name || '').toUpperCase());
+            }
         }
     }, true);
 };
@@ -379,15 +392,15 @@ Games.selectRegion = function(clickEvent, region) {
     clickEvent.stopPropagation();
     Sound.UIClick();
     game.playRegion = region;
-    Games.updateRegion(false);
-    Games.updateType();
+    // Games.updateRegion(false);
+    // Games.updateType();
 };
 
 Games.selectGame = function(clickEvent, room) {
     clickEvent.stopPropagation();
     Sound.UIClick();
     game.playRoom = room;
-    Games.updateType(false);
+    // Games.updateType(false);
 };
 
 Games.closeDropdowns = function() {
