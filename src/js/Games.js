@@ -973,7 +973,7 @@ Games.start = function(playerName, fromMainPage) {
         game.playRegion = regionId;
 
         // Room
-        let roomId = getSelectedRoomId();
+        let roomId = game.playRoom;
         let regionGame = getGameByRegionAndRoom(game.playRegion, roomId);
         game.playHost = regionGame.host || window.location.host;
         game.playPath = regionGame.path;
