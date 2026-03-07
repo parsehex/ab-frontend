@@ -1749,7 +1749,6 @@ var setupMobileUI = function() {
 };
 
 UI.reconnection = function() {
-    chatLineId = 0,
     s = -1,
     playerStats = {
         score: -1,
@@ -1769,7 +1768,6 @@ UI.reconnection = function() {
     Games.wipe(),
     $("#gameinfo").html("&nbsp;"),
     $("#scoreboard").html(""),
-    $("#chatlines").html(""),
     $("#score-score").html("&nbsp;"),
     $("#score-upgrades").html("&nbsp;"),
     $("#score-rank").html("-"),
