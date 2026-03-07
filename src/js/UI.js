@@ -368,14 +368,14 @@ UI.scoreboardUpdate = function (msgData, msgRankings, maxScoreboard) {
                        If a player is missing from the minimap for longer than the 3s
                        post-death duration (PLAYERS_DEATH_INACTIVITY_MS in ab-server)
                        after their kill, then we assume the player is spectating.
-                       
-                       We have knowledge of these last-killed times because all player 
-                       kills are broadcast to all players. However, if we join a game 
+
+                       We have knowledge of these last-killed times because all player
+                       kills are broadcast to all players. However, if we join a game
                        and a player has been killed just before that, we don't know if
                        they are spectating or just awaiting revival.
 
-                       So we assume they are spectating, by having the lastKilled 
-                       property initialised to zero (rather than performance.now()) in 
+                       So we assume they are spectating, by having the lastKilled
+                       property initialised to zero (rather than performance.now()) in
                        Player constructor. If this is wrong, it will be corrected within
                        a few seconds, when they respawn/revive.
                     */
@@ -492,7 +492,7 @@ UI.scoreboardUpdate = function (msgData, msgRankings, maxScoreboard) {
     if (!isEndOfScoreboard && msgData.length > maxScoreboard) {
         html += '<div class="line dottedline">&middot; &middot; &middot;</div>';
     }
-    
+
     $("#scoreboard").html(html);
 };
 
@@ -636,7 +636,7 @@ UI.addChatLine = function(msg, text, msgType) {
         chatLineId++;
         if (0 == msgType) {
             let nickClass = "nick";
-            if (game.gameType === Network.GAMETYPE.CTF) {
+            if (game.gameType === GameType.CTF) {
                 if (msg.isSpectating && msg.isSpectating()) {
                     nickClass += " greyed";
                 } else if (msg.team === 1) {
@@ -694,9 +694,9 @@ UI.showChatLevel = function(e) {
     null != t && UI.addChatMessage(t, true)
 };
 
-/** 
+/**
  * Updates the game info display with player count, bot count, and ping time
- * 
+ *
  * For FFA, splits player count into active and spectating players
  * For CTF, also splits the player count into red and blue team active players
  */
