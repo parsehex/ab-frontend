@@ -1852,17 +1852,20 @@ UI.dragChat = function(e) {
         game.screenY - n < 100 && (n = game.screenY - 100);
         var r = t - chatBoxDimensions.x,
             i = n - chatBoxDimensions.y;
+        var w = Math.max(100, Math.min(700, chatBoxDimensions.width + r));
+        var h = Math.max(50, Math.min(500, chatBoxDimensions.height - i));
+
         $("#chatbox").css({
-            width: chatBoxDimensions.width + r + "px",
-            height: chatBoxDimensions.height - i + "px"
+            width: w + "px",
+            height: h + "px"
         }),
         $("#minimizechatcontainer").css({
-            width: chatBoxDimensions.width + r + "px",
-            bottom: chatBoxDimensions.height - i + "px"
+            width: w + "px",
+            bottom: h + "px"
         }),
         $("#chatinput").css({
-            width: chatBoxDimensions.width + r - 12 + "px",
-            bottom: chatBoxDimensions.height - i + 20 + "px"
+            width: w - 12 + "px",
+            bottom: h + 20 + "px"
         })
     }
 };
@@ -1879,9 +1882,12 @@ UI.endDragChat = function(e) {
 
 UI.setup = function() {
     if (config.settings.chatWidth && config.settings.chatHeight) {
-        $("#chatbox").css({ width: config.settings.chatWidth + "px", height: config.settings.chatHeight + "px" });
-        $("#minimizechatcontainer").css({ width: config.settings.chatWidth + "px", bottom: config.settings.chatHeight + "px" });
-        $("#chatinput").css({ width: (config.settings.chatWidth - 12) + "px", bottom: (config.settings.chatHeight + 20) + "px" });
+        var w = Math.max(100, Math.min(700, config.settings.chatWidth));
+        var h = Math.max(50, Math.min(500, config.settings.chatHeight));
+
+        $("#chatbox").css({ width: w + "px", height: h + "px" });
+        $("#minimizechatcontainer").css({ width: w + "px", bottom: h + "px" });
+        $("#chatinput").css({ width: (w - 12) + "px", bottom: (h + 20) + "px" });
     }
     $(window).resize(onWindowResize),
     $(window).on("orientationchange", onWindowResize),
