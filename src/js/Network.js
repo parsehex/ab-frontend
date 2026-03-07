@@ -472,7 +472,7 @@ Network.setup = function() {
         console.error("WebSocket error observed:", event);
         UI.serverMessage({
             type: 1,
-            text: "WebSocket connection failed. Try disabling AdBlock!",
+            text: "WebSocket connection failed. The server might be offline, but try disabling AdBlock!",
             duration: 30000
         });
     }
@@ -499,7 +499,7 @@ var initBackupSock = function() {
         console.error("WebSocket error observed:", event);
         UI.serverMessage({
             type: 1,
-            text: "WebSocket connection failed. Try disabling AdBlock!",
+            text: "WebSocket connection failed. The server might be offline, but try disabling AdBlock!",
             duration: 30000
         });
     }
