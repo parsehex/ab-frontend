@@ -975,6 +975,14 @@ input:focus {
     color: #c6b9e4
 }
 
+#chatbox .line .red {
+    color: #e4b9b9
+}
+
+#chatbox .line .greyed {
+    color: #888888
+}
+
 #chatbox .msg {
     height: 17px
 }
