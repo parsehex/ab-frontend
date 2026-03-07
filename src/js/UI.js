@@ -1870,10 +1870,19 @@ UI.dragChat = function(e) {
 UI.endDragChat = function(e) {
     $("#chatbox").removeClass("hovered"),
     $(window).off("mousemove", UI.dragChat),
-    $(window).off("mouseup", UI.endDragChat)
+    $(window).off("mouseup", UI.endDragChat),
+    Tools.setSettings({
+        chatWidth: $("#chatbox").width() + 16,
+        chatHeight: $("#chatbox").height() + 16
+    });
 };
 
 UI.setup = function() {
+    if (config.settings.chatWidth && config.settings.chatHeight) {
+        $("#chatbox").css({ width: config.settings.chatWidth + "px", height: config.settings.chatHeight + "px" });
+        $("#minimizechatcontainer").css({ width: config.settings.chatWidth + "px", bottom: config.settings.chatHeight + "px" });
+        $("#chatinput").css({ width: (config.settings.chatWidth - 12) + "px", bottom: (config.settings.chatHeight + 20) + "px" });
+    }
     $(window).resize(onWindowResize),
     $(window).on("orientationchange", onWindowResize),
     $(window).on("contextmenu", function(e) {
