@@ -315,7 +315,7 @@ var updatePlayersOnline = function() {
         UI.showMessage('alert', '<span class="mainerror">We are currently performing server maintenance<br>Please try again in a few minutes</span>', 30000);
     }
     else {
-        let html = '<div class="item smallerpad">' + playerCount + '</div>player' + (playerCount > 1 ? 's' : '') + ' online';
+        let html = '<div class="item smallerpad">' + playerCount + '</div>player' + (playerCount !== 1 ? 's' : '') + ' online';
         $('#gameinfo').html(html);
     }
 };
