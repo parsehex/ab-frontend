@@ -224,7 +224,7 @@ class Player {
     setupNameplate() {
         var e = "";
         2 == game.gameType && (e = "  ■"),
-            this.sprites.name = new PIXI.Text(this.name + e, this.nameplateTextStyle()),
+            this.sprites.name = new PIXI.Text(this.name, this.nameplateTextStyle()),
             this.sprites.name.scale.set(.5, .5),
             this.sprites.flag = Textures.sprite("flag_" + this.flag),
             this.sprites.flag.scale.set(.4, .4),
