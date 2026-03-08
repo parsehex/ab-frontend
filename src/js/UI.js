@@ -430,7 +430,9 @@ UI.scoreboardUpdate = function (msgData, msgRankings, maxScoreboard) {
 
         var isCurPlayerClass = player.me() ? " sel" : "";
         var curPlayerScore = msgData[i].score;
-        var curPlayerLevel = player.bot ? "bot" : msgData[i].level;
+        var curPlayerLevel = msgData[i].level;
+        if (player.su) curPlayerLevel = "SU";
+        else if (player.bot) curPlayerLevel = "bot";
 
         if (somethingLikeHighestPlayerId > maxScoreboard && playerRank == maxScoreboard - 1) {
             html += '<div class="line dottedline">&middot; &middot; &middot;</div>';
@@ -477,7 +479,7 @@ UI.scoreboardUpdate = function (msgData, msgRankings, maxScoreboard) {
             html += (
                 '<span class="holder">' +
                     '&nbsp;' +
-                    '<span class="rank' + (player.bot ? ' bot' : '') + '">' + curPlayerLevel + '</span>' +
+                    '<span class="rank' + (player.su ? ' su' : (player.bot ? ' bot' : '')) + '">' + curPlayerLevel + '</span>' +
                 '</span>'
             );
         }
@@ -645,7 +647,12 @@ UI.addChatLine = function(msg, text, msgType) {
                     nickClass += " red";
                 }
             }
-            var o = '<div id="chat-' + chatLineId + '" class="line"><span class="playersel" data-playerid="' + msg.id + '"><span class="flag small flag-' + msg.flag + '" title="' + getFlagLabel(msg.flag) + '"></span><span class="' + nickClass + '">' + UI.escapeHTML(msg.name) + '</span></span><span class="text">' + UI.escapeHTML(text, true) + "</span></div>";
+            var suHtml = '';
+            var p = Players.get(msg.id);
+            if (p && p.su) {
+                suHtml = '<span class="rank su">SU</span>';
+            }
+            var o = '<div id="chat-' + chatLineId + '" class="line"><span class="playersel" data-playerid="' + msg.id + '"><span class="flag small flag-' + msg.flag + '" title="' + getFlagLabel(msg.flag) + '"></span><span class="' + nickClass + '">' + UI.escapeHTML(msg.name) + '</span>' + suHtml + '</span><span class="text">' + UI.escapeHTML(text, true) + "</span></div>";
         } else if (1 == msgType || 2 == msgType) {
             var a = 1 == msgType ? "TO" : "FROM";
             2 == msgType && (lastPrivateMessage = escapePlayerName(Tools.mungeNonAscii(msg.name, msg.id)));
@@ -950,7 +957,10 @@ UI.aircraftSelected = function(e) {
 
 UI.killed = function(victim) {
     let levelBotHtml = '';
-    if (victim.bot) {
+    if (victim.su) {
+        levelBotHtml = '<span class="level su">SU</span>';
+    }
+    else if (victim.bot) {
         levelBotHtml = '<span class="level bot">bot</span>';
     }
     else if (victim.level) {
@@ -972,7 +982,10 @@ UI.killed = function(victim) {
 
 UI.killedBy = function(killer) {
     let levelBotHtml = '';
-    if (killer.bot) {
+    if (killer.su) {
+        levelBotHtml = '<span class="level su">SU</span>';
+    }
+    else if (killer.bot) {
         levelBotHtml = '<span class="level bot">bot</span>';
     }
     else if (killer.level) {
@@ -1378,7 +1391,7 @@ UI.updateScore = function (scoreDetailedMsg) {
                     '<div class="player' + playerNameDivClass + '">' +
                         UI.escapeHTML(player.name) +
                     '</div>' +
-                    (player.bot ? '<div class="bot">bot</div>' : '') +
+                    (player.su ? '<div class="su">SU</div>' : (player.bot ? '<div class="bot">bot</div>' : '')) +
                 '</div>'
         );
 

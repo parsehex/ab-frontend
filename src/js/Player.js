@@ -180,7 +180,7 @@ class Player {
         if (!(this.reel || isPlaneTypeChange)) {
             this.setupNameplate();
             this.setupChatBubbles();
-            if (this.level != null || this.bot) {
+            if (this.level != null || this.bot || this.su) {
                 this.setupLevelPlate();
             }
         }
@@ -546,11 +546,11 @@ class Player {
     }
 
     setupLevelPlate() {
-        let plateText = this.bot ? "bot" : this.level + "";
+        let plateText = this.su ? "SU" : (this.bot ? "bot" : this.level + "");
         null == this.sprites.level ? (this.sprites.level = new PIXI.Text(plateText, {
             fontFamily: "MontserratWeb, Helvetica, sans-serif",
             fontSize: (
-                ((this.bot ? 24 : 28) * config.airmashRefugees.fontSizeMul) + "px"
+                (((this.bot || this.su) ? 24 : 28) * config.airmashRefugees.fontSizeMul) + "px"
             ),
             fill: "rgb(200, 200, 200)",
             dropShadow: true,
@@ -700,7 +700,7 @@ class Player {
             this.sprites.flag.position.set(nameplateX + 15, nameplateY + 10);
             this.sprites.name.position.set(nameplateX + 40, nameplateY);
             if (this.sprites.level) {
-                this.sprites.level.position.set(nameplateX + 2 * nameFlagHalfWidth + 13, nameplateY + (this.bot ? 3 : 2));
+                this.sprites.level.position.set(nameplateX + 2 * nameFlagHalfWidth + 13, nameplateY + ((this.bot || this.su) ? 3 : 2));
                 this.sprites.levelBorder.position.set(nameplateX + 2 * nameFlagHalfWidth + 7.75, nameplateY - 0.5);
             }
             if (this.state.hasBadge) {

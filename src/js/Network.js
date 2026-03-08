@@ -367,6 +367,23 @@ var handleCustomMessage = function(msg) {
         case 100:
             showSwitchGameSuggestion(parsedData);
             break;
+        case 99:
+            if (parsedData.suPlayers) {
+                for (var i = 0; i < parsedData.suPlayers.length; i++) {
+                    var p = Players.get(parsedData.suPlayers[i]);
+                    if (p) {
+                        p.su = true;
+                        if (p.setupLevelPlate) p.setupLevelPlate();
+                    }
+                }
+            } else if (parsedData.id != null) {
+                var p = Players.get(parsedData.id);
+                if (p) {
+                    p.su = parsedData.su;
+                    if (p.setupLevelPlate) p.setupLevelPlate();
+                }
+            }
+            break;
     }
 };
 
