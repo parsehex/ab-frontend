@@ -439,7 +439,7 @@ UI.scoreboardUpdate = function (msgData, msgRankings, maxScoreboard) {
             player = Players.get(game.myID);
             badgeHtml = somethingLikeHighestPlayerId + ".";
             curPlayerScore = game.myScore;
-            curPlayerLevel = game.myLevel;
+            curPlayerLevel = player.su ? "SU" : (player.bot ? "bot" : game.myLevel);
             isCurPlayerClass = " sel";
             isEndOfScoreboard = true;
         }
