@@ -944,6 +944,7 @@ input:focus {
     background-color: #6d57a0
 }
 
+
 #chatbox .line .playersel {
     cursor: pointer;
     white-space: nowrap
@@ -953,6 +954,9 @@ input:focus {
     padding-right: 10px;
     color: #fff;
     font-weight: bold
+}
+#chatbox .line.team-line .nick {
+    color: #886dc1;
 }
 
 #chatbox .line .su {
@@ -979,16 +983,19 @@ input:focus {
 #chatbox .line .text {
     color: #d2d2d2
 }
+#chatbox .line.team-line .text {
+    color: #c1afe9
+}
 
 #chatbox .line .green {
     color: #78d07f
 }
 
-#chatbox .line .blue {
+#chatbox .line:not(.team-line) .blue {
     color: #4d7fd5
 }
 
-#chatbox .line .red {
+#chatbox .line:not(.team-line) .red {
     color: #dc4f46
 }
 

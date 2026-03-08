@@ -659,7 +659,7 @@ UI.addChatLine = function(msg, text, msgType) {
             o = '<div id="chat-' + chatLineId + '" class="line"><span class="tag whisper">' + a + '</span><span class="playersel" data-playerid="' + msg.id + '"><span class="nick green">' + UI.escapeHTML(msg.name) + '</span></span><span class="text green">' + UI.escapeHTML(text, true) + "</span></div>";
             s = -1
         } else {
-            o = '<div id="chat-' + chatLineId + '" class="line"><span class="tag team">TEAM</span><span class="playersel" data-playerid="' + msg.id + '"><span class="nick blue">' + UI.escapeHTML(msg.name) + '</span></span><span class="text blue">' + UI.escapeHTML(text, true) + "</span></div>";
+            o = '<div id="chat-' + chatLineId + '" class="line team-line"><span class="tag team">TEAM</span><span class="playersel" data-playerid="' + msg.id + '"><span class="nick blue">' + UI.escapeHTML(msg.name) + '</span></span><span class="text blue">' + UI.escapeHTML(text, true) + "</span></div>";
             s = -1
         }
         var o = $(o);
