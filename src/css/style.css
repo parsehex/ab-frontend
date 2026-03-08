@@ -924,6 +924,13 @@ input:focus {
     line-height: 18px;
 }
 
+#chatbox .separator {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.2) 80%, transparent);
+    margin: 12px 0;
+    width: 100%;
+}
+
 #chatbox .line .tag {
     display: inline-block;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);

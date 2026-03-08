@@ -695,6 +695,14 @@ UI.addChatMessage = function(text, isNotWarning) {
     o.scrollTop(o[0].scrollHeight)
 };
 
+UI.addChatSeparator = function() {
+    var n = '<div class="separator"></div>';
+    $("#chatlines").append(n);
+    var o = $("#chatbox");
+    o.perfectScrollbar("update"),
+    o.scrollTop(o[0].scrollHeight)
+};
+
 UI.showChatLevel = function(e) {
     var t = null;
     2 == e ? t = "Type /flag XX where XX is the 2-letter ISO code of a country" : 3 == e ? t = "Emotes available: /tf /pepe /clap /lol /bro /kappa /cry /rage" : 4 == e && (t = "Flag Pack #1: communist confederate imperial rainbow jolly"),
@@ -1777,6 +1785,7 @@ UI.reconnection = function() {
     UI.resetPowerups(),
     UI.hideSpectator(),
     UI.wipeAllMinimapMobs(),
+    UI.addChatSeparator(),
     UI.wipeAllMessages(),
     Games.wipe(),
     $("#gameinfo").html("&nbsp;"),
