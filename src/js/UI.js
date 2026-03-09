@@ -696,8 +696,15 @@ UI.addChatMessage = function(text, isNotWarning) {
 };
 
 UI.addChatSeparator = function() {
+    var chatlines = $("#chatlines");
+    if (chatlines.children().length === 0) {
+        return;
+    }
+    if (chatlines.children().last().hasClass("separator")) {
+        return;
+    }
     var n = '<div class="separator"></div>';
-    $("#chatlines").append(n);
+    chatlines.append(n);
     var o = $("#chatbox");
     o.perfectScrollbar("update"),
     o.scrollTop(o[0].scrollHeight)

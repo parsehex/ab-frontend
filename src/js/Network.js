@@ -110,8 +110,8 @@ Network.detectConnectivity = function() {
 
 Network.shutdown = function() {
     null != ackIntervalId && clearInterval(ackIntervalId),
-    null != primarySock && primarySock.close(),
-    null != backupSock && backupSock.close(),
+    null != primarySock && (primarySock.onclose = null, primarySock.close()),
+    null != backupSock && (backupSock.onclose = null, backupSock.close()),
     backupSockIsConnected = false,
     shouldSendNextAckOnBackupSock = false,
     baseDivClk = -1,
@@ -388,7 +388,7 @@ var handleCustomMessage = function(msg) {
 };
 
 var isValidGameServerId = function(gameServerId) {
-    const re = /^[a-z0-9]+-[a-z0-9]+$/m;
+    const re = /^[a-z0-9]+(-[a-z0-9]+)?$/m;
     return re.test(gameServerId);
 };
 
@@ -433,11 +433,25 @@ var shouldDiscardTimestampedMessage = function(msg) {
     }
 };
 
-Network.reconnectMessage = function() {
-    game.reloading || UI.showMessage("alert", '<span class="info">DISCONNECTED</span>Connection reset<br><span class="button" onclick="Network.reconnect()">RECONNECT</span>', 6e5)
+Network.reconnectMessage = function(wasConnecting) {
+    if (!game.reloading) {
+        if (wasConnecting) {
+            UI.showMessage("alert", '<span class="info">DISCONNECTED</span>Connection reset<br><span class="button" style="background-color: #555; pointer-events: none;">WAIT...</span>', 6e5);
+            Network.reconnectCooldown = true;
+            setTimeout(function() {
+                Network.reconnectCooldown = false;
+                UI.showMessage("alert", '<span class="info">DISCONNECTED</span>Connection reset<br><span class="button" onclick="Network.reconnect()">RECONNECT</span>', 6e5);
+            }, 3000);
+        } else {
+            UI.showMessage("alert", '<span class="info">DISCONNECTED</span>Connection reset<br><span class="button" onclick="Network.reconnect()">RECONNECT</span>', 6e5);
+        }
+    }
 };
 
+Network.reconnectCooldown = false;
+
 Network.reconnect = function() {
+    if (Network.reconnectCooldown) return;
     UI.showMessage("alert", "", 100),
     Games.switchGame()
 };
@@ -476,12 +490,13 @@ Network.setup = function() {
             clearInterval(ackIntervalId)
         }
 
-        if (game.state !== Network.STATE.CONNECTING) {
-            game.server = {};
-            game.state = Network.STATE.CONNECTING;
-            if (lastReceivedError === false) {
-                Network.reconnectMessage();
-            }
+        let wasConnecting = game.state === Network.STATE.CONNECTING;
+
+        game.server = {};
+        game.state = Network.STATE.CONNECTING;
+        
+        if (lastReceivedError === false) {
+            Network.reconnectMessage(wasConnecting);
         }
     }
     ,
