@@ -215,6 +215,7 @@ Input.setup = function() {
     $(window).on("keyup", onWindowKeyUp),
     $(window).on("mousedown", Input.mouseDown),
     $(window).on("mouseup", Input.mouseUp),
+    $(window).on("mousemove", onWindowMouseMove),
     $(window).on("gamepadconnected", function(e) {
         UI.showMessage("alert", '<span class="info">GAMEPAD CONNECTED</span>' + UI.escapeHTML(e.originalEvent.gamepad.id), 3e3),
         isGamepadConnected = true,
@@ -584,8 +585,31 @@ Input.mouseDown = function(e) {
     if ((0 == t.button || 2 == t.button) && null != t.target.tagName && "canvas" == t.target.tagName.toLowerCase()) {
         if (null != game.spectatingID) {
             let camera = Graphics.getCamera();
-            let gameX = camera.x + (t.clientX - game.halfScreenX) / game.scale;
-            let gameY = camera.y + (t.clientY - game.halfScreenY) / game.scale;
+            let screenX = t.clientX;
+            let screenY = t.clientY;
+
+            // Check minimap click
+            let mmRight = game.screenX - config.minimapPaddingX;
+            let mmBottom = game.screenY - config.minimapPaddingY;
+            let mmLeft = mmRight - config.minimapSize;
+            let mmTop = mmBottom - config.minimapSize / 2;
+
+            if (screenX >= mmLeft && screenX <= mmRight && screenY >= mmTop && screenY <= mmBottom) {
+                let ratioX = (screenX - mmLeft) / config.minimapSize;
+                let ratioY = (screenY - mmTop) / (config.minimapSize / 2);
+                let worldX = ratioX * 32768 - 16384;
+                let worldY = ratioY * 16384 - 8192;
+                let nearest = Players.getNearest(worldX, worldY, 1500); // More precise distance for minimap
+                if (nearest) {
+                    Network.sendCommand("spectate", nearest.id + "");
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+            // Regular in-game click
+            let gameX = camera.x + (screenX - game.halfScreenX) / game.scale;
+            let gameY = camera.y + (screenY - game.halfScreenY) / game.scale;
             let nearest = Players.getNearest(gameX, gameY, 150 / game.scale);
             if (nearest) {
                 Network.sendCommand("spectate", nearest.id + "");
@@ -612,6 +636,44 @@ Input.mouseUp = function(e) {
         } else
             A("FIRE", false),
             A("SPECIAL", false)
+};
+
+var onWindowMouseMove = function(e) {
+    if (null != game.spectatingID && e.target.tagName && "canvas" == e.target.tagName.toLowerCase()) {
+        let screenX = e.clientX;
+        let screenY = e.clientY;
+
+        // Minimap hover
+        let mmRight = game.screenX - config.minimapPaddingX;
+        let mmBottom = game.screenY - config.minimapPaddingY;
+        let mmLeft = mmRight - config.minimapSize;
+        let mmTop = mmBottom - config.minimapSize / 2;
+
+        if (screenX >= mmLeft && screenX <= mmRight && screenY >= mmTop && screenY <= mmBottom) {
+            let ratioX = (screenX - mmLeft) / config.minimapSize;
+            let ratioY = (screenY - mmTop) / (config.minimapSize / 2);
+            let worldX = ratioX * 32768 - 16384;
+            let worldY = ratioY * 16384 - 8192;
+            let nearest = Players.getNearest(worldX, worldY, 1500); // Precise hover for minimap
+            if (nearest) {
+                document.body.style.cursor = "pointer";
+                return;
+            }
+        }
+
+        // Ship hover
+        let camera = Graphics.getCamera();
+        let gameX = camera.x + (screenX - game.halfScreenX) / game.scale;
+        let gameY = camera.y + (screenY - game.halfScreenY) / game.scale;
+        let nearest = Players.getNearest(gameX, gameY, 150 / game.scale);
+        if (nearest) {
+            document.body.style.cursor = "pointer";
+            return;
+        }
+    }
+    if (document.body.style.cursor === "pointer" && (!e.target.dataset || !e.target.dataset.playerid)) {
+         document.body.style.cursor = "";
+    }
 };
 
 var A = function(t, n) {
