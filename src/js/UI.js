@@ -1396,6 +1396,7 @@ UI.updateScore = function (scoreDetailedMsg) {
                     '</div>' +
                     '<div class="flag small flag-' + player.flag + '" ' +
                         'title="' + getFlagLabel(player.flag) + '"></div>' +
+                    '<div class="ship-icon ship-type-' + player.type + '"></div>' +
                     '<div class="player' + playerNameDivClass + '">' +
                         UI.escapeHTML(player.name) +
                     '</div>' +
