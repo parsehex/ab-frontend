@@ -283,6 +283,27 @@ Players.wipe = function() {
     }
 };
 
+Players.getNearest = function(x, y, maxDistance) {
+    let nearestPlayer = null;
+    let minDistance = maxDistance || Infinity;
+
+    for (let id in playersById) {
+        let player = playersById[id];
+        if (player.status !== 0 || player.me()) continue;
+
+        let dx = player.pos.x - x;
+        let dy = player.pos.y - y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            nearestPlayer = player;
+        }
+    }
+
+    return nearestPlayer;
+};
+
 Players.all = function() { // SPATIE
     return playersById;
 };

@@ -298,11 +298,13 @@ UI.showSpectator = function(e) {
         isSpectating = true
     }
     $("#spectator").html(e),
+    $("body").addClass("is-spectating"),
     Input.addTouchRejection("#spectator")
 };
 
 UI.hideSpectator = function() {
     isSpectating && ($("#spectator").remove(),
+    $("body").removeClass("is-spectating"),
     isSpectating = false)
 };
 
@@ -465,7 +467,7 @@ UI.scoreboardUpdate = function (msgData, msgRankings, maxScoreboard) {
         }
 
         html += (
-            '<div class="line ' + isCurPlayerClass + '">' +
+            '<div class="line ' + isCurPlayerClass + '" data-playerid="' + player.id + '">' +
                 '<span class="place ' + placeCssClass + '">' +
                     badgeHtml +
                 '</span>' +
@@ -1396,7 +1398,7 @@ UI.updateScore = function (scoreDetailedMsg) {
         }
 
         containerHtml += (
-            '<div class="item ' + curPlayerIsMeClass + '">' +
+            '<div class="item ' + curPlayerIsMeClass + '" data-playerid="' + player.id + '">' +
                 '<div class="name">' +
                     '<div class="position">' +
                         badgeHtml +
@@ -1637,6 +1639,17 @@ UI.nameEntered = function() {
         Games.start(playerName, true);
     } else {
         Games.highlightInput("#playername");
+    }
+};
+
+UI.onScoreboardClick = function(event) {
+    let target = $(event.target).closest('[data-playerid]');
+    if (target.length > 0) {
+        let playerId = target.data('playerid');
+        if (playerId != null && playerId != game.myID) {
+            Network.sendCommand("spectate", playerId + "");
+            event.stopPropagation();
+        }
     }
 };
 
@@ -1972,6 +1985,8 @@ UI.setup = function() {
     $("#mainmenu").on("click", function(e) {
         e.stopPropagation()
     }),
+    $("#scoreboard").on("click", UI.onScoreboardClick),
+    $("#scorecontainer").on("click", UI.onScoreboardClick),
     $("#scoredetailed").on("click", function(e) {
         e.stopPropagation()
     }),

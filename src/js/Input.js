@@ -213,6 +213,8 @@ Input.setup = function() {
     updateKeybindsList(true),
     $(window).on("keydown", onWindowKeyDown),
     $(window).on("keyup", onWindowKeyUp),
+    $(window).on("mousedown", Input.mouseDown),
+    $(window).on("mouseup", Input.mouseUp),
     $(window).on("gamepadconnected", function(e) {
         UI.showMessage("alert", '<span class="info">GAMEPAD CONNECTED</span>' + UI.escapeHTML(e.originalEvent.gamepad.id), 3e3),
         isGamepadConnected = true,
@@ -564,13 +566,9 @@ Input.setupTouch = function() {
 
 Input.toggleMouse = function(e) {
     if (!config.mobile)
-        if ($(window).off("mousedown"),
-        $(window).off("mouseup"),
-        config.mouse = !config.mouse,
+        if (config.mouse = !config.mouse,
         config.mouse) {
-            if ($(window).on("mousedown", Input.mouseDown),
-            $(window).on("mouseup", Input.mouseUp),
-            e)
+            if (e)
                 return;
             UI.showMessage("alert", '<span class="info">MOUSE MODE</span>Enabled<div class="mousemode"><span class="info">LEFT CLICK</span>Fire&nbsp;&nbsp;&nbsp;<span class="info">RIGHT CLICK</span>Special&nbsp;&nbsp;&nbsp;<span class="info">WASD</span>Move</div>', 7e3),
             Tools.setSettings({
@@ -584,15 +582,29 @@ Input.toggleMouse = function(e) {
 Input.mouseDown = function(e) {
     var t = e.originalEvent;
     if ((0 == t.button || 2 == t.button) && null != t.target.tagName && "canvas" == t.target.tagName.toLowerCase()) {
-        var n = 0 == t.button ? "FIRE" : "SPECIAL";
-        A(n, true),
-        e.preventDefault()
+        if (null != game.spectatingID) {
+            let camera = Graphics.getCamera();
+            let gameX = camera.x + (t.clientX - game.halfScreenX) / game.scale;
+            let gameY = camera.y + (t.clientY - game.halfScreenY) / game.scale;
+            let nearest = Players.getNearest(gameX, gameY, 150 / game.scale);
+            if (nearest) {
+                Network.sendCommand("spectate", nearest.id + "");
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        if (config.mouse) {
+            var n = 0 == t.button ? "FIRE" : "SPECIAL";
+            A(n, true),
+            e.preventDefault()
+        }
     }
 };
 
 Input.mouseUp = function(e) {
     var t = e.originalEvent;
-    if (0 == t.button || 2 == t.button)
+    if (config.mouse && (0 == t.button || 2 == t.button))
         if (null != t.target.tagName && "canvas" == t.target.tagName.toLowerCase()) {
             var n = 0 == t.button ? "FIRE" : "SPECIAL";
             A(n, false),
