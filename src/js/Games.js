@@ -128,11 +128,7 @@ Games.setup = function() {
             Games.updateRegion(false);
             Games.updateType(false);
             
-            // Update the play button to have the game shortname
-            let selectedGame = gamesData[0].games[0];
-            if (selectedGame) {
-                $('#playbutton').html('PLAY ' + (selectedGame.nameShort || selectedGame.name || '').toUpperCase());
-            }
+            Games.updatePlayButton();
         }
     }, true);
 };
@@ -245,6 +241,7 @@ Games.playerAuth = function() {
                 $('#lifetime-account').remove();
 
                 $('#playbutton').html('PLAY');
+                Games.updatePlayButton();
                 UI.show('#playbutton', true);
                 
                 Tools.setSettings(remoteSettings);
@@ -317,6 +314,22 @@ var updatePlayersOnline = function() {
     else {
         let html = '<div class="item smallerpad">' + playerCount + '</div>player' + (playerCount !== 1 ? 's' : '') + ' online';
         $('#gameinfo').html(html);
+
+        if (gamesData.length > 1 || gameCount > 1) {
+            $('.playoptions').show();
+            if (gamesData.length === 1) {
+                $('#playregion').hide();
+            } else {
+                $('#playregion').show();
+            }
+            if (gameCount === 1) {
+                $('#playtype').hide();
+            } else {
+                $('#playtype').show();
+            }
+        } else {
+            $('.playoptions').hide();
+        }
     }
 };
 
@@ -389,15 +402,17 @@ Games.selectRegion = function(clickEvent, region) {
     clickEvent.stopPropagation();
     Sound.UIClick();
     game.playRegion = region;
-    // Games.updateRegion(false);
-    // Games.updateType();
+    Games.updateRegion(false);
+    Games.updateType();
+    Games.updatePlayButton();
 };
 
 Games.selectGame = function(clickEvent, room) {
     clickEvent.stopPropagation();
     Sound.UIClick();
     game.playRoom = room;
-    // Games.updateType(false);
+    Games.updateType(false);
+    Games.updatePlayButton();
 };
 
 Games.closeDropdowns = function() {
@@ -488,8 +503,12 @@ Games.updateRegion = function(menuVisible, clickEvent) {
             // Bottom padding
             html += '<div class="item"></div>';
 
+            let totalGames = 0;
+            for (let r of gamesData) totalGames += (r.games ? r.games.length : 0);
+            let isSingleGame = totalGames <= 1;
+
             css = {
-                width: '240px',
+                width: isSingleGame ? '330px' : '240px',
                 height: 'auto',
                 'z-index': '2'
             };
@@ -501,8 +520,12 @@ Games.updateRegion = function(menuVisible, clickEvent) {
             html += '<div class="arrowdown"></div>';
             html += '<div class="playtop">REGION</div>';
             html += '<div class="playbottom">' + getRegionByName(game.playRegion).name + '</div>';
+            let totalGames = 0;
+            for (let r of gamesData) totalGames += (r.games ? r.games.length : 0);
+            let isSingleGame = totalGames <= 1;
+
             css = {
-                width: '130px',
+                width: isSingleGame ? '330px' : '130px',
                 height: '40px',
                 'z-index': 'auto'
             };
@@ -606,10 +629,13 @@ Games.updateType = function(menuVisible, clickEvent) {
 
             html += '<div class="item"></div>';
 
+            let isSingleRegion = gamesData.length <= 1;
+
             css = {
-                width: '280px',
+                width: isSingleRegion ? '330px' : '280px',
                 height: 'auto',
-                'z-index': '2'
+                'z-index': '2',
+                left: isSingleRegion ? '0px' : '140px'
             };
 
             $('#playtype').removeClass('hoverable');
@@ -634,10 +660,13 @@ Games.updateType = function(menuVisible, clickEvent) {
 
             html += '<div class="playbottom">' + name + '</div>';
 
+            let isSingleRegion = gamesData.length <= 1;
+
             css = {
-                width: '190px',
+                width: isSingleRegion ? '330px' : '190px',
                 height: '40px',
-                'z-index': 'auto'
+                'z-index': 'auto',
+                left: isSingleRegion ? '0px' : '140px'
             };
 
             $('#playtype').addClass('hoverable');
@@ -647,6 +676,17 @@ Games.updateType = function(menuVisible, clickEvent) {
         $('#playtype').css(css);
 
         playTypeMenuVisible = menuVisible;
+    }
+};
+
+Games.updatePlayButton = function() {
+    let selectedRegionId = getSelectedOrClosestRegionId();
+    if (!selectedRegionId) return;
+    
+    let selectedGame = getGameByRegionAndRoom(selectedRegionId, game.playRoom);
+    if (selectedGame) {
+        let name = (selectedGame.nameShort || selectedGame.name || '').toUpperCase();
+        $('#playbutton').html('PLAY ' + name);
     }
 };
 
