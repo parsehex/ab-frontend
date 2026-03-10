@@ -657,6 +657,7 @@ class Player {
         if (this.me()) {
             game.myType = this.type;
             game.spectatingID = null;
+            game.freeCamera = false;
             UI.aircraftSelected(this.type);
             UI.visibilityHUD(true);
             UI.hideSpectator();
