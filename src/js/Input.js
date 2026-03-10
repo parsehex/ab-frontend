@@ -522,6 +522,9 @@ Input.update = function() {
         }
 
         if (moved) {
+            game.cameraPos.x = Tools.clamp(game.cameraPos.x, -16384, 16384);
+            game.cameraPos.y = Tools.clamp(game.cameraPos.y, -8192, 8192);
+
             let now = Date.now();
             if (!this._lastFreeCamUpdate || now - this._lastFreeCamUpdate > 250) {
                 this._lastFreeCamUpdate = now;
