@@ -280,7 +280,12 @@ Input.toggleFreeCamera = function() {
         game.cameraPos.y = camera.y;
         UI.showMessage("alert", '<span class="info">FREE CAMERA</span>Enabled', 3e3);
     } else {
-        Network.spectateNext();
+        let nearestPlayer = Players.getNearest(game.cameraPos.x, game.cameraPos.y, 500);
+        if (nearestPlayer) {
+            Network.sendCommand("spectate", nearestPlayer.id);
+        } else {
+            Network.spectateNext();
+        }
         UI.showMessage("alert", '<span class="info">FREE CAMERA</span>Disabled', 3e3);
     }
 
