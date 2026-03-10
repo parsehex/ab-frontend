@@ -594,6 +594,7 @@ UI.parseCommand = function(chatInput) {
         if(null == (player = Players.getByName(unescapePlayerName(words[1])))) {
             UI.addChatMessage("Unknown player");
         } else {
+            game.freeCamera = false;
             Network.sendCommand("spectate", player.id + "");
         }
     } else if("flag" === command || "flags" === command) {

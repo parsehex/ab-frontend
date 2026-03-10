@@ -13,6 +13,8 @@ window.game = {
     halfScreenX: 0,
     halfScreenY: 0,
     scale: 1,
+    freeCamera: false,
+    cameraPos: { x: 0, y: 0 },
     spectatingID: null,
     myID: null,
     myType: null,

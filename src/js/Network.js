@@ -62,12 +62,19 @@ Network.sendTeam = function(text) {
 };
 
 Network.sendCommand = function(com, data) {
-    game.state == Network.STATE.PLAYING && ("flag" === com && (game.lastFlagSet = data),
-    sendMessageDict({
-        c: ClientPacket.COMMAND,
-        com: com,
-        data: data
-    }))
+    if (game.state == Network.STATE.PLAYING) {
+        if ("flag" === com) {
+            game.lastFlagSet = data;
+        }
+        if ("spectate" === com) {
+            game.freeCamera = false;
+        }
+        sendMessageDict({
+            c: ClientPacket.COMMAND,
+            com: com,
+            data: data
+        });
+    }
 };
 
 Network.voteMute = function(playerId) {
@@ -215,7 +222,8 @@ var dispatchIncomingMessage = function(msg) {
                 game.roomName = UI.escapeHTML(msg.room);
                 game.gameType = msg.type;
                 game.spectatingID = null;
-                game.myLevel = 0;
+                game.myFlag = game.myFlag || "";
+                game.freeCamera = false;
                 handleServerConfigUpdate(msg.serverConfiguration);
                 Games.prep();
                 baseDivClk = msg.clock / 100;

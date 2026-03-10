@@ -10,7 +10,9 @@ Players.update = function() {
     for (t in playersById)
         0 == (n = playersById[t]).status && (n.update(game.timeFactor),
         n.updateGraphics(game.timeFactor));
-    if (null != game.spectatingID) {
+    if (game.freeCamera) {
+        Graphics.setCamera(game.cameraPos.x, game.cameraPos.y);
+    } else if (null != game.spectatingID) {
         if (null == (n = playersById[game.spectatingID]))
             return;
         if (game.timeNetwork - n.lastPacket > 3e3)
@@ -281,6 +283,7 @@ Players.wipe = function() {
         playersById[id].destroy(true);
         delete playersById[id];
     }
+    game.freeCamera = false;
 };
 
 Players.getNearest = function(x, y, maxDistance) {

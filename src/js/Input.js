@@ -46,7 +46,8 @@ var lastTransmittedKeyState = {},
         ALTZOOM: ["BACKSPACE"],
         ZOOMOUT: ["-"],
         ZOOMIN: ["="],
-        DEFAULTZOOM: ["0"]
+        DEFAULTZOOM: ["0"],
+        FREECAMERA: ["C"]
     },
     p = {},
     movementKeySet = {
@@ -101,7 +102,8 @@ var lastTransmittedKeyState = {},
         ["Invite Friends", "INVITE"],
         ["Mouse Mode", "MOUSEMODE"],
         ["Zoom In", "ZOOMIN"],
-        ["Alternate Zoom", "ALTZOOM"]
+        ["Alternate Zoom", "ALTZOOM"],
+        ["Free Camera", "FREECAMERA"]
     ],
     keyNameByCode = {},
     keyCodeByName = {
@@ -231,9 +233,9 @@ Input.setup = function() {
 var onWindowKeyDown = function(event) {
     if (game.state == Network.STATE.PLAYING || game.state == Network.STATE.CONNECTING) {
         var keyCode = event.which;
-        
+
         if (respawnHook(event)) return;
-        
+
         if (72 != keyCode && UI.hideHelp(),
         null != c && P(keyCode))
             event.preventDefault();
@@ -241,10 +243,10 @@ var onWindowKeyDown = function(event) {
             var bind = Input.getBind(keyCode);
             if (!shouldInterpretAsControlKey(keyCode))
                 return null == movementKeySet[bind] ? (isPressedByKeyCode[keyCode] || (isPressedByKeyCode[keyCode] = true,
-                UI.controlKey(keyCode, bind, true)),
+                "FREECAMERA" === bind ? Input.toggleFreeCamera() : UI.controlKey(keyCode, bind, true)),
                 event.preventDefault(),
                 false) : (lastTransmittedKeyState[bind] || (lastTransmittedKeyState[bind] = true,
-                C(bind)),
+                game.freeCamera ? null : C(bind)),
                 t[keyCode] || (t[keyCode] = true),
                 event.preventDefault(),
                 false)
@@ -263,6 +265,28 @@ var onWindowKeyUp = function(event) {
             t[keyCode] && (t[keyCode] = false),
             event.preventDefault(),
             false
+    }
+};
+
+Input.toggleFreeCamera = function() {
+    if (null == game.spectatingID) {
+        return;
+    }
+
+    game.freeCamera = !game.freeCamera;
+    if (game.freeCamera) {
+        let camera = Graphics.getCamera();
+        game.cameraPos.x = camera.x;
+        game.cameraPos.y = camera.y;
+        UI.showMessage("alert", '<span class="info">FREE CAMERA</span>Enabled', 3e3);
+    } else {
+        Network.spectateNext();
+        UI.showMessage("alert", '<span class="info">FREE CAMERA</span>Disabled', 3e3);
+    }
+
+    // Update spectator UI if it's visible
+    if ($("#spectator").is(":visible")) {
+        Games.spectate(game.spectatingID);
     }
 };
 
@@ -471,6 +495,36 @@ Input.update = function() {
         } else
             isGamepadConnected = false
     }
+
+    if (game.freeCamera) {
+        let speed = 7 * game.timeFactor / game.scale;
+        let moved = false;
+        if (Input.keyState("UP")) {
+            game.cameraPos.y -= speed;
+            moved = true;
+        }
+        if (Input.keyState("DOWN")) {
+            game.cameraPos.y += speed;
+            moved = true;
+        }
+        if (Input.keyState("LEFT")) {
+            game.cameraPos.x -= speed;
+            moved = true;
+        }
+        if (Input.keyState("RIGHT")) {
+            game.cameraPos.x += speed;
+            moved = true;
+        }
+
+        if (moved) {
+            let now = Date.now();
+            if (!this._lastFreeCamUpdate || now - this._lastFreeCamUpdate > 250) {
+                this._lastFreeCamUpdate = now;
+                Network.sendCommand("freecam", Math.round(game.cameraPos.x) + "," + Math.round(game.cameraPos.y));
+            }
+        }
+        Graphics.setCamera(game.cameraPos.x, game.cameraPos.y);
+    }
 };
 
 Input.unpressKey = function(keyCode) {
@@ -617,7 +671,7 @@ Input.mouseDown = function(e) {
                 return;
             }
         }
-        
+
         if (config.mouse) {
             var n = 0 == t.button ? "FIRE" : "SPECIAL";
             A(n, true),

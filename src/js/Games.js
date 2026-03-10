@@ -795,6 +795,7 @@ Games.switchGame = function(gameServerId) {
     game.myScore = 0;
     game.server = {};
     game.state = Network.STATE.CONNECTING;
+    game.freeCamera = false;
     Network.shutdown();
     Particles.wipe();
     Players.wipe();
@@ -1321,6 +1322,7 @@ Games.spectate = function(playerId) {
     html += '<div id="spectator-tag" class="spectating">Spectating ' + (player == null ? '' : UI.escapeHTML(player.name)) + '</div>';
     html += '<div class="buttons">'
     html += '<div onclick="Network.spectateNext()" class="changeplayer left"><div class="arrow"></div></div>';
+    html += '<div onclick="Input.toggleFreeCamera()" class="free-camera-button' + (game.freeCamera ? ' active' : '') + '">FREE CAMERA</div>';
     html += '<div onclick="Network.spectatePrev()" class="changeplayer right"><div class="arrow"></div></div>';
     html += '</div>';
 

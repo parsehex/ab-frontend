@@ -4581,3 +4581,31 @@ only screen and (min-height:600px) and (max-height:1024px) and (max-width:1024px
 body.is-spectating [data-playerid] {
     cursor: pointer;
 }
+#spectator .buttons .free-camera-button {
+    display: inline-block;
+    height: 38px;
+    padding: 0 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 7px;
+    color: #c8c8c8;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    vertical-align: top;
+    line-height: 38px;
+    margin: 0 5px;
+    border: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+#spectator .buttons .free-camera-button:hover {
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+#spectator .buttons .free-camera-button.active {
+    color: #fff;
+    background-color: #447da7;
+    box-shadow: 0 0 10px rgba(68, 125, 167, 0.5);
+}
