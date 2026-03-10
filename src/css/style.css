@@ -1382,6 +1382,10 @@ input:focus {
     pointer-events: none;
 }
 
+#gamespecific .playersel {
+    pointer-events: auto;
+}
+
 #gamespecific .blueflag {
     position: absolute;
     top: 0;
