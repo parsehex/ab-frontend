@@ -639,39 +639,47 @@ Input.mouseUp = function(e) {
 };
 
 var onWindowMouseMove = function(e) {
-    if (null != game.spectatingID && e.target.tagName && "canvas" == e.target.tagName.toLowerCase()) {
-        let screenX = e.clientX;
-        let screenY = e.clientY;
+    if (null != game.spectatingID) {
+        // Elements with playerid (scoreboard, carrier name)
+        if (e.target.dataset && e.target.dataset.playerid) {
+            document.body.style.cursor = "pointer";
+            return;
+        }
 
-        // Minimap hover
-        let mmRight = game.screenX - config.minimapPaddingX;
-        let mmBottom = game.screenY - config.minimapPaddingY;
-        let mmLeft = mmRight - config.minimapSize;
-        let mmTop = mmBottom - config.minimapSize / 2;
+        if (e.target.tagName && "canvas" == e.target.tagName.toLowerCase()) {
+            let screenX = e.clientX;
+            let screenY = e.clientY;
 
-        if (screenX >= mmLeft && screenX <= mmRight && screenY >= mmTop && screenY <= mmBottom) {
-            let ratioX = (screenX - mmLeft) / config.minimapSize;
-            let ratioY = (screenY - mmTop) / (config.minimapSize / 2);
-            let worldX = ratioX * 32768 - 16384;
-            let worldY = ratioY * 16384 - 8192;
-            let nearest = Players.getNearest(worldX, worldY, 1500); // Precise hover for minimap
+            // Minimap hover
+            let mmRight = game.screenX - config.minimapPaddingX;
+            let mmBottom = game.screenY - config.minimapPaddingY;
+            let mmLeft = mmRight - config.minimapSize;
+            let mmTop = mmBottom - config.minimapSize / 2;
+
+            if (screenX >= mmLeft && screenX <= mmRight && screenY >= mmTop && screenY <= mmBottom) {
+                let ratioX = (screenX - mmLeft) / config.minimapSize;
+                let ratioY = (screenY - mmTop) / (config.minimapSize / 2);
+                let worldX = ratioX * 32768 - 16384;
+                let worldY = ratioY * 16384 - 8192;
+                let nearest = Players.getNearest(worldX, worldY, 1500); // Precise hover for minimap
+                if (nearest) {
+                    document.body.style.cursor = "pointer";
+                    return;
+                }
+            }
+
+            // Ship hover
+            let camera = Graphics.getCamera();
+            let gameX = camera.x + (screenX - game.halfScreenX) / game.scale;
+            let gameY = camera.y + (screenY - game.halfScreenY) / game.scale;
+            let nearest = Players.getNearest(gameX, gameY, 150 / game.scale);
             if (nearest) {
                 document.body.style.cursor = "pointer";
                 return;
             }
         }
-
-        // Ship hover
-        let camera = Graphics.getCamera();
-        let gameX = camera.x + (screenX - game.halfScreenX) / game.scale;
-        let gameY = camera.y + (screenY - game.halfScreenY) / game.scale;
-        let nearest = Players.getNearest(gameX, gameY, 150 / game.scale);
-        if (nearest) {
-            document.body.style.cursor = "pointer";
-            return;
-        }
     }
-    if (document.body.style.cursor === "pointer" && (!e.target.dataset || !e.target.dataset.playerid)) {
+    if (document.body.style.cursor === "pointer") {
          document.body.style.cursor = "";
     }
 };

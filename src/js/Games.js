@@ -1225,12 +1225,13 @@ Games.networkFlag = function(msg) {
         flag.playerId = msg.id;
         let player = Players.get(msg.id);
         if (player != null) {
+            let carrierNameHtml = '<span class="playersel" data-playerid="' + player.id + '">' + UI.escapeHTML(player.name) + '</span>';
             // Position of player name is to the left for blue, right for red
             if (msg.flag == 1) {
-                html = UI.escapeHTML(player.name) + html;
+                html = carrierNameHtml + html;
             }
             else {
-                html += UI.escapeHTML(player.name);
+                html += carrierNameHtml;
             }
         }
         flag.diffX = player.pos.x;

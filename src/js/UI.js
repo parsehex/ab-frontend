@@ -1987,9 +1987,8 @@ UI.setup = function() {
     }),
     $("#scoreboard").on("click", UI.onScoreboardClick),
     $("#scorecontainer").on("click", UI.onScoreboardClick),
-    $("#scoredetailed").on("click", function(e) {
-        e.stopPropagation()
-    }),
+    $("#scoredetailed").on("click", UI.onScoreboardClick),
+    $("#gamespecific").on("click", UI.onScoreboardClick),
     $("#invitefriends").on("click", function(e) {
         e.stopPropagation()
     }),
