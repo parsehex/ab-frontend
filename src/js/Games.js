@@ -1324,7 +1324,8 @@ Games.spectate = function(playerId) {
     // Display spectator status text
     let html = '';
     let player = Players.get(playerId);
-    html += '<div id="spectator-tag" class="spectating">Spectating ' + (player == null ? '' : UI.escapeHTML(player.name)) + '</div>';
+    let tagText = game.freeCamera ? 'Spectating' : 'Spectating ' + (player == null ? '' : UI.escapeHTML(player.name));
+    html += '<div id="spectator-tag" class="spectating">' + tagText + '</div>';
     html += '<div class="buttons">'
     html += '<div onclick="Network.spectateNext()" class="changeplayer left"><div class="arrow"></div></div>';
     html += '<div onclick="Input.toggleFreeCamera()" class="free-camera-button' + (game.freeCamera ? ' active' : '') + '">FREE CAMERA</div>';
@@ -1340,6 +1341,9 @@ Games.spectate = function(playerId) {
  * This is for when players are killed or leave the game
  */
 Games.spectatorSwitch = function(id) {
+    if (game.freeCamera) {
+        return;
+    }
     setTimeout(function() {
         if (id === game.spectatingID) {
             Network.spectateNext();
