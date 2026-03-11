@@ -634,6 +634,16 @@ UI.onChatlineClick = function(event)
 
 
 UI.addChatLine = function(msg, text, msgType) {
+    if (msg.name === 'Server' || msg.id === 0) {
+        if (text.indexOf('Upgrades fever started') !== -1 || text.indexOf('upgrades fever event is ongoing') !== -1) {
+            game.upgradesFever = true;
+            Graphics.renderCTFSpawnLines();
+        } else if (text.indexOf('Upgrades fever ended') !== -1) {
+            game.upgradesFever = false;
+            Graphics.renderCTFSpawnLines();
+        }
+    }
+
     // Infected mode uses teams 1 & 2
     // If the player's id matches their team = Server player
     const isInfectedMsg = game.gameType === 4 && msg.id === msg.team && text.indexOf("infected") !== -1;

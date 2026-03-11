@@ -7,10 +7,11 @@ var renderer, cameraState = {
     lastOverdraw: Vector.zero(),
     lastOverdrawTime: 0,
     shake: 0
-    }, 
-    pixiTextureByName = {}, 
-    pixiSpriteByName = {}, 
-    pixiContainerByName = {};
+    },
+    pixiTextureByName = {},
+    pixiSpriteByName = {},
+    pixiContainerByName = {},
+    pixiCTFSpawnLines;
 
 Graphics.setup = function() {
     initGameObjScreenVars(window.innerWidth, window.innerHeight),
@@ -65,7 +66,49 @@ var setupPixiContainers = function() {
             gfx.endFill();
         pixiContainerByName.objects.addChild(gfx)
     }
+    setupCTFSpawnLines();
 }
+
+var setupCTFSpawnLines = function() {
+    pixiCTFSpawnLines = new PIXI.Graphics();
+    pixiContainerByName.groundobjects.addChild(pixiCTFSpawnLines);
+}
+
+Graphics.renderCTFSpawnLines = function() {
+    if (!pixiCTFSpawnLines) return;
+    pixiCTFSpawnLines.clear();
+    if (game.gameType !== GameType.CTF || !game.upgradesFever) return;
+
+    const zones = window.CTF_EXTRA_SPAWN_ZONES;
+    const blueColor = 0x4fc3f7;
+    const redColor = 0xff5252;
+    const alpha = 0.05;
+    const lineWidth = 15;
+
+    // Blue Trigger Lines (at X = 0)
+    pixiCTFSpawnLines.lineStyle(lineWidth, blueColor, alpha);
+    // North section (to Y divide)
+    pixiCTFSpawnLines.moveTo(zones.BLUE.X_TRIGGER, -8192);
+    pixiCTFSpawnLines.lineTo(zones.BLUE.X_TRIGGER, zones.BLUE.Y_DIVIDE);
+    // South section (to Y divide)
+    pixiCTFSpawnLines.moveTo(zones.BLUE.X_TRIGGER, 8192);
+    pixiCTFSpawnLines.lineTo(zones.BLUE.X_TRIGGER, zones.BLUE.Y_DIVIDE);
+    // Horizontal Divide (from X trigger to map edge)
+    pixiCTFSpawnLines.moveTo(zones.BLUE.X_TRIGGER, zones.BLUE.Y_DIVIDE);
+    pixiCTFSpawnLines.lineTo(16384, zones.BLUE.Y_DIVIDE);
+
+    // Red Trigger Lines (at X = -1024)
+    pixiCTFSpawnLines.lineStyle(lineWidth, redColor, alpha);
+    // North section (to Y divide)
+    pixiCTFSpawnLines.moveTo(zones.RED.X_TRIGGER, -8192);
+    pixiCTFSpawnLines.lineTo(zones.RED.X_TRIGGER, zones.RED.Y_DIVIDE);
+    // South section (to Y divide)
+    pixiCTFSpawnLines.moveTo(zones.RED.X_TRIGGER, 8192);
+    pixiCTFSpawnLines.lineTo(zones.RED.X_TRIGGER, zones.RED.Y_DIVIDE);
+    // Horizontal Divide (from X trigger to map edge)
+    pixiCTFSpawnLines.moveTo(zones.RED.X_TRIGGER, zones.RED.Y_DIVIDE);
+    pixiCTFSpawnLines.lineTo(-16384, zones.RED.Y_DIVIDE);
+};
 
 var initPixiTextures = function() {
     pixiTextureByName.render = PIXI.RenderTexture.create(game.screenX + config.overdraw, game.screenY + config.overdraw, void 0, config.settings.hidpi ? 2 : void 0),

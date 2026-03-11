@@ -335,3 +335,15 @@ window.CrateTextureNameByMobType = {
     [MobType.Inferno]: "crateRampage",
     [MobType.MagicCrate]: "crateMagic"
 };
+
+window.CTF_EXTRA_SPAWN_ZONES = {
+    // These are the boundaries that determine which extra spawn point players will go to
+    BLUE: {
+        X_TRIGGER: 0,
+        Y_DIVIDE: 0
+    },
+    RED: {
+        X_TRIGGER: -1024,
+        Y_DIVIDE: -512
+    }
+};

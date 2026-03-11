@@ -1102,6 +1102,8 @@ Games.prep = function() {
                 '<div id="redflag-name" class="redflag-player">&nbsp;</div>'
                 );
             UI.show('#gamespecific');
+            game.upgradesFever = false;
+            Graphics.renderCTFSpawnLines();
 
             // Set up game state for CTF, including sprites
             ctf = {
@@ -1161,6 +1163,9 @@ Games.prep = function() {
 Games.wipe = function() {
     // Clear BTR firewall
     removeFirewall();
+
+    // Clear CTF spawn lines
+    Graphics.renderCTFSpawnLines();
 
     // If exists, clear all CTF graphics
     if (ctf.flagBlue && ctf.flagRed) {
