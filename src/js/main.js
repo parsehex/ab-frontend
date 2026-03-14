@@ -13,3 +13,4 @@ import './Sound';
 import './Textures';
 import './Tools';
 import './UI';
+import './BotLogOverlay';
