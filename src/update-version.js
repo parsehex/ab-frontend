@@ -10,7 +10,7 @@ console.log(`Reading ${packageJsonPath}`);
 const version = JSON.parse(fs.readFileSync(packageJsonPath)).version
 
 console.log(`Version is ${version}`);
-const js = `module.exports = '${version}'`;
+const js = `export default '${version}'`;
 
 console.log(`Writing ${versionJsPath}`);
 fs.writeFileSync(versionJsPath, js);

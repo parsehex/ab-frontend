@@ -1,3 +1,5 @@
+import version from './Version';
+
 window.DEVELOPMENT = (
     /^http:\/\/127\.0\.0\.1:[0-9]{1,5}\/?$/.test(window.origin) ||
     (new URLSearchParams(window.location.search)).has('dev')
@@ -5,7 +7,7 @@ window.DEVELOPMENT = (
 
 window.game = {
     protocol: 5,
-    version: `v${require('./Version')}`,
+    version: `v${version}`,
     state: 0,
     focus: true,
     screenX: 0,

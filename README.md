@@ -24,7 +24,7 @@ more readable and maintainable:
 
 ### Building and deployment
 
-The code has been repackaged with npm to use [webpack](https://webpack.js.org/) for
+The code has been repackaged with npm to use [Vite](https://vite.dev/) for
 building the final frontend code. To build locally, issue these commands after cloning
 the repo:
 
@@ -35,7 +35,9 @@ npm run build
 
 The output will be created in `dist/`, and can be served using a local web server for testing (e.g. something like `cd dist ; python3 -m http.server`).
 
-For development, `DEBUG=1 npm run build` cuts build time down by disabling minification.
+For local iteration without HMR, use `npm run watch` to keep rebuilding on changes.
+
+For development, `DEBUG=1 npm run build` (or `DEBUG=1 npm run watch`) disables minification.
 
 ### This repository contains proprietary code
 
