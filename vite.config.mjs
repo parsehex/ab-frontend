@@ -26,7 +26,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    sourcemap: true,
+    sourcemap: process.env.DEBUG === '1',
     minify: process.env.DEBUG === '1' ? false : 'esbuild',
     rollupOptions: {
       input: {
