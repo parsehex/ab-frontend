@@ -29,6 +29,22 @@
             <link rel="stylesheet" href="assets/style.css">
             <script>
                 window.global = window;
+
+                // Pixi v4 text rendering performs frequent canvas readbacks.
+                // Hint browsers to optimize this path for 2D contexts.
+                (function() {
+                    var originalGetContext = HTMLCanvasElement.prototype.getContext;
+                    HTMLCanvasElement.prototype.getContext = function(type, options) {
+                        if (type === '2d') {
+                            if (!options || typeof options !== 'object') {
+                                options = { willReadFrequently: true };
+                            } else if (!('willReadFrequently' in options)) {
+                                options = Object.assign({ willReadFrequently: true }, options);
+                            }
+                        }
+                        return originalGetContext.call(this, type, options);
+                    };
+                })();
             </script>
             <script type="module" src="assets/extra.js"></script>
             <script type="module" src="assets/engine.js"></script>
