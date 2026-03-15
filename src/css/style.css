@@ -2063,6 +2063,64 @@ input:focus {
     top: 5px !important
 }
 
+#score-ship-counts {
+    margin: 2px 0 6px 0;
+    width: 27%;
+    position: absolute;
+    top: 25px;
+}
+
+#score-ship-counts .ship-counts-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1px;
+    gap: 3px;
+}
+
+#score-ship-counts .ship-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    width: 26px;
+}
+
+#score-ship-counts .ship-count .ship-icon-sm {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background-size: 14px 14px;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+    opacity: 0.85;
+}
+
+#score-ship-counts .ship-count .count {
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    color: inherit;
+    line-height: 1;
+}
+
+#score-ship-counts .ship-count.empty .ship-icon-sm,
+#score-ship-counts .ship-count.empty .count {
+    visibility: hidden;
+}
+
+#score-ship-counts .ship-count.ship-count-spec {
+    margin-left: auto;
+    color: #b2b2b2;
+    min-width: auto;
+    padding-left: 6px;
+    /* border-left: 1px solid #b2b2b2; */
+    border-left: 1px solid rgba(178, 178, 178, 0.5);
+}
+
+#score-ship-counts .ship-count.ship-count-spec .count-prefix {
+    font-size: 11px;
+    opacity: 0.85;
+}
+
 .badge {
     background-repeat: no-repeat;
     display: inline-block;

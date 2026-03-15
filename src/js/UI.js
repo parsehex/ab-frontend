@@ -1516,7 +1516,57 @@ UI.updateScore = function (scoreDetailedMsg) {
             <div class="damage">&nbsp;&nbsp;&bull;&nbsp;&nbsp;${ formattedAwesomeMetric}${formattedAwesomeUnit}</div>
         `;
     }
+    // Build ship type counts from the scores data (player.type is reliable here)
+    var shipCountsBlue = {}, shipCountsRed = {}, shipCountsAll = {};
+    var specCountBlue = 0, specCountRed = 0, specCountAll = 0;
+    for (var si = 0; si < scores.length; si++) {
+        var sp = Players.get(scores[si].id);
+        if (!sp || sp.name === 'Server') continue;
+        var isSiSpec = scoreDetailedMsg.c === Network.SERVERPACKET.SCORE_DETAILED_BTR
+            ? !scores[si].alive
+            : sp.isSpectating();
+        if (isSiSpec) {
+            specCountAll++;
+            if (sp.team === 1) specCountBlue++;
+            else if (sp.team === 2) specCountRed++;
+            continue;
+        }
+        var st = sp.type;
+        if (!st) continue;
+        shipCountsAll[st] = (shipCountsAll[st] || 0) + 1;
+        if (sp.team === 1) shipCountsBlue[st] = (shipCountsBlue[st] || 0) + 1;
+        else if (sp.team === 2) shipCountsRed[st] = (shipCountsRed[st] || 0) + 1;
+    }
+    var buildShipRow = function(counts, color, specCount) {
+        var hasAny = specCount > 0;
+        var row = '<div class="ship-counts-row"' + (color ? ' style="color:' + color + '"' : '') + '>';
+        for (var t = 1; t <= 5; t++) {
+            var typeCount = counts[t] || 0;
+            if (typeCount > 0) {
+                hasAny = true;
+                row += '<span class="ship-count"><span class="ship-icon-sm ship-type-' + t + '"></span><span class="count">' + typeCount + '</span></span>';
+            } else {
+                // Keep slot widths consistent so ship types line up across rows.
+                row += '<span class="ship-count empty"><span class="ship-icon-sm ship-type-' + t + '"></span><span class="count">0</span></span>';
+            }
+        }
+        if (specCount > 0) {
+            row += '<span class="ship-count ship-count-spec"><span class="count-prefix">S</span><span class="count">' + specCount + '</span></span>';
+        }
+        row += '</div>';
+        return hasAny ? row : '';
+    };
+    var shipCountsHtml = '';
+    if (game.gameType === GameType.CTF || game.gameType === GameType.INF) {
+        var isInfMode = game.gameType === GameType.INF;
+        shipCountsHtml += buildShipRow(shipCountsBlue, isInfMode ? '#FFEC52' : '#4d7fd5', specCountBlue);
+        shipCountsHtml += buildShipRow(shipCountsRed, isInfMode ? '#78d07f' : '#dc4f46', specCountRed);
+    } else {
+        shipCountsHtml += buildShipRow(shipCountsAll, null, specCountAll);
+    }
+
     $("#scoreplayers").html(playerHtml);
+    $("#score-ship-counts").html(shipCountsHtml);
     $("#scoretable").html(tableHtml);
     $("#scorecontainer").html(containerHtml);
     $("#scoremvp").html(mvpHtml);
