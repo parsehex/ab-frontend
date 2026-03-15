@@ -264,24 +264,6 @@ function stopOverlay() {
   overlayApi.stop();
 }
 
-function installToggleHint() {
-  const hint = document.createElement('div');
-  hint.textContent = 'Bot logs: Ctrl+Shift+B or Main Menu';
-  hint.style.cssText = [
-    'position:fixed',
-    'left:10px',
-    'bottom:10px',
-    'z-index:999998',
-    'font:11px Menlo,Monaco,Consolas,monospace',
-    'background:rgba(0,0,0,0.55)',
-    'color:#9ec4e8',
-    'padding:3px 6px',
-    'border-radius:4px',
-    'pointer-events:none'
-  ].join(';');
-  document.body.appendChild(hint);
-}
-
 function installMainMenuToggle() {
   const settings = document.querySelector('#mainmenu .settings');
   if (!settings || document.getElementById(MENU_ITEM_ID)) {
@@ -327,7 +309,6 @@ function installMainMenuToggle() {
 }
 
 function boot() {
-  installToggleHint();
   installMainMenuToggle();
 
   const enabled = isOverlayEnabled();
