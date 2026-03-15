@@ -13,9 +13,38 @@ var primarySock = null,
     lastTombstoneGcTime = 0,
     sendKeyCount = 0,
     oldTimeNetwork = 0,
+    connectTimeoutTimer = null,
     lastReceivedError = false,
     f = 2e3,
     g = 2e3;
+
+const CONNECT_TIMEOUT_MS = 15e3;
+
+var clearConnectTimeout = function() {
+    if (connectTimeoutTimer != null) {
+        clearTimeout(connectTimeoutTimer);
+        connectTimeoutTimer = null;
+    }
+};
+
+var armConnectTimeout = function() {
+    clearConnectTimeout();
+
+    connectTimeoutTimer = setTimeout(function() {
+        if (game.reloading || game.state !== Network.STATE.CONNECTING || null == primarySock) {
+            return;
+        }
+
+        if (primarySock.readyState === WebSocket.CONNECTING) {
+            try {
+                primarySock.onclose = null;
+                primarySock.close();
+            } catch (e) {}
+
+            Network.reconnectMessage(false);
+        }
+    }, CONNECT_TIMEOUT_MS);
+};
 
 Network.sendKey = function(keyCode, isPressed) {
     if (game.state == Network.STATE.PLAYING) {
@@ -117,6 +146,7 @@ Network.detectConnectivity = function() {
 
 Network.shutdown = function() {
     null != ackIntervalId && clearInterval(ackIntervalId),
+    clearConnectTimeout(),
     null != primarySock && (primarySock.onclose = null, primarySock.close()),
     null != backupSock && (backupSock.onclose = null, backupSock.close()),
     backupSockIsConnected = false,
@@ -481,7 +511,9 @@ Network.setup = function() {
     }
     backupSock && backupSockIsConnected && backupSock.close(),
     (primarySock = new WebSocket(currentSockUrl)).binaryType = "arraybuffer",
+    armConnectTimeout(),
     primarySock.onopen = function() {
+        clearConnectTimeout();
         sendMessageDict({
             c: ClientPacket.LOGIN,
             protocol: game.protocol,
@@ -494,6 +526,7 @@ Network.setup = function() {
     }
     ,
     primarySock.onclose = function() {
+        clearConnectTimeout();
         if (ackIntervalId != null) {
             clearInterval(ackIntervalId)
         }
