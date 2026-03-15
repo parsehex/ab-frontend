@@ -45,6 +45,10 @@ let gamesData = defaultGamesData;
 let isGamesDataEmpty = false;
 
 let ctf = {};
+let ctfCaptureCounts = {
+    blue: 0,
+    red: 0
+};
 
 let firewallSprites = {};
 let minimapFirewallMask = null;
@@ -1103,6 +1107,10 @@ Games.prep = function() {
                 );
             UI.show('#gamespecific');
             game.upgradesFever = false;
+            ctfCaptureCounts = {
+                blue: 0,
+                red: 0
+            };
             Graphics.renderCTFSpawnLines();
 
             // Set up game state for CTF, including sprites
@@ -1161,6 +1169,11 @@ Games.prep = function() {
 };
 
 Games.wipe = function() {
+    ctfCaptureCounts = {
+        blue: 0,
+        red: 0
+    };
+
     // Clear BTR firewall
     removeFirewall();
 
@@ -1203,6 +1216,21 @@ Games.networkFlag = function(msg) {
         flag = ctf.flagRed;
         selector = '#redflag-name';
         flagCaptures = msg.redteam;
+    }
+
+    let previousCaptures = msg.flag == 1 ? ctfCaptureCounts.blue : ctfCaptureCounts.red;
+    if (flagCaptures === previousCaptures + 1) {
+        let carrier = null;
+        if (flag.playerId != null) {
+            carrier = Players.get(flag.playerId);
+        }
+        UI.logCapture(msg.flag, flagCaptures, carrier);
+    }
+    if (msg.flag == 1) {
+        ctfCaptureCounts.blue = flagCaptures;
+    }
+    else {
+        ctfCaptureCounts.red = flagCaptures;
     }
 
     // Common values for flag display

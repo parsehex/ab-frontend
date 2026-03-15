@@ -97,7 +97,194 @@ var minimapMobs = {},
         104: ["Missile Speed"]
     },
     emoteById = ["tf", "pepe", "clap", "lol", "bro", "kappa", "cry", "rage"],
-    powerupNameById = ["", "Shield", "Inferno"];
+    powerupNameById = ["", "Shield", "Inferno"],
+    gameLogEntries = [],
+    gameLogFilterState = {
+        kills: true,
+        connections: true,
+        captures: true
+    },
+    gameLogMaxEntries = 80;
+
+var gameLogLabelByType = {
+    kills: "KILL",
+    connections: "CONNECTION",
+    captures: "CAPTURE"
+};
+
+var getGameLogPlayerClassName = function(player) {
+    if (!player) {
+        return "";
+    }
+
+    if (typeof player.isSpectating === "function" && player.isSpectating()) {
+        return "spectating";
+    }
+
+    if (player.team === 1) {
+        return "team-blue";
+    }
+
+    if (player.team === 2) {
+        return "team-red";
+    }
+
+    return "";
+};
+
+var gameLogPlayerHtml = function(player) {
+    var className = getGameLogPlayerClassName(player);
+    var classes = "name" + (className ? " " + className : "");
+    return '<span class="' + classes + '">' + UI.escapeHTML(Tools.stripBotsNamePrefix(player.name)) + '</span>';
+};
+
+var saveGameLogFilterState = function() {
+    var settings = {
+        gameLogFilters: {
+            kills: gameLogFilterState.kills,
+            connections: gameLogFilterState.connections,
+            captures: gameLogFilterState.captures
+        }
+    };
+    Tools.setSettings(settings);
+};
+
+var loadGameLogFilterState = function() {
+    var saved = config.settings.gameLogFilters;
+    if (!saved || typeof saved !== "object") {
+        return;
+    }
+
+    for (var filterName in gameLogFilterState) {
+        if (saved.hasOwnProperty(filterName) && typeof saved[filterName] === "boolean") {
+            gameLogFilterState[filterName] = saved[filterName];
+        }
+    }
+};
+
+var formatGameLogTime = function(now) {
+    var padded = function(value) {
+        return (value < 10 ? "0" : "") + value;
+    };
+
+    return padded(now.getHours()) + ":" + padded(now.getMinutes()) + ":" + padded(now.getSeconds());
+};
+
+var updateGameLogFilterButtons = function() {
+    for (var filterName in gameLogFilterState) {
+        $("#gamelog-filter-" + filterName).toggleClass("active", gameLogFilterState[filterName]);
+    }
+};
+
+var renderGameLog = function() {
+    var lines = $("#gamelog-lines");
+    if (!lines.length) {
+        return;
+    }
+
+    var linesEl = lines[0];
+    var previousScrollTop = linesEl.scrollTop;
+    var distanceFromBottom = linesEl.scrollHeight - (linesEl.scrollTop + linesEl.clientHeight);
+    // Treat users within a small threshold as pinned to bottom.
+    var shouldStickToBottom = distanceFromBottom <= 24;
+
+    var html = "";
+    for (var i = 0; i < gameLogEntries.length; i++) {
+        var entry = gameLogEntries[i];
+        if (!gameLogFilterState[entry.type]) {
+            continue;
+        }
+
+        html += '<div class="entry ' + entry.type + '">';
+        html += '<span class="ts">[' + entry.time + ']</span>';
+        html += '<span class="text">' + (entry.isHtml ? entry.text : UI.escapeHTML(entry.text)) + '</span>';
+        html += "</div>";
+    }
+
+    if (html === "") {
+        lines.parent().hide();
+    } else {
+        lines.parent().show();
+
+    }
+
+    lines.html(html);
+    if (shouldStickToBottom) {
+        lines.scrollTop(linesEl.scrollHeight);
+    } else {
+        lines.scrollTop(previousScrollTop);
+    }
+    updateGameLogFilterButtons();
+};
+
+var appendGameLog = function(type, text, isHtml) {
+    if (!gameLogFilterState.hasOwnProperty(type)) {
+        return;
+    }
+
+    gameLogEntries.push({
+        type: type,
+        text: text,
+        isHtml: !!isHtml,
+        time: formatGameLogTime(new Date())
+    });
+
+    if (gameLogEntries.length > gameLogMaxEntries) {
+        gameLogEntries.splice(0, gameLogEntries.length - gameLogMaxEntries);
+    }
+
+    renderGameLog();
+};
+
+UI.toggleGameLogFilter = function(filterName) {
+    if (!gameLogFilterState.hasOwnProperty(filterName)) {
+        return;
+    }
+
+    gameLogFilterState[filterName] = !gameLogFilterState[filterName];
+    saveGameLogFilterState();
+    renderGameLog();
+};
+
+UI.resetGameLog = function() {
+    gameLogEntries = [];
+    renderGameLog();
+};
+
+UI.logConnection = function(player, isConnected) {
+    if (!player || player.bot || player.name === "Server") {
+        return;
+    }
+
+    var action = isConnected ? "joined the game" : "left the game";
+    appendGameLog("connections", gameLogPlayerHtml(player) + " " + action, true);
+};
+
+UI.logKill = function(killer, victim) {
+    if (!victim) {
+        return;
+    }
+
+    if (!killer || killer.id === victim.id) {
+        appendGameLog("kills", gameLogPlayerHtml(victim) + " was destroyed", true);
+        return;
+    }
+
+    appendGameLog("kills", gameLogPlayerHtml(killer) + " destroyed " + gameLogPlayerHtml(victim), true);
+};
+
+UI.logCapture = function(team, captures, carrier) {
+    var teamName = team == 1 ? "Blue" : "Red";
+    var text = teamName + " captured the flag";
+    if (carrier) {
+        text += " (" + gameLogPlayerHtml(carrier) + ")";
+    }
+    if (captures != null) {
+        text += " " + captures + "/3";
+    }
+
+    appendGameLog("captures", text, true);
+};
 
 UI.show = function(selector, isInlineBlock) {
     $(selector).css({
@@ -1806,6 +1993,7 @@ UI.gameStart = function(playerName, isFirstTime) {
     if (isFirstTime) {
         $("#login-ui").remove();
         UI.show("#logosmall");
+    UI.show("#gamelog-ui");
         // UI.show("#menu", true);
         if (!config.mobile) {
                 UI.show("#chatbox");
@@ -1828,6 +2016,7 @@ UI.gameStart = function(playerName, isFirstTime) {
             });
         }
     }
+    UI.resetGameLog();
     UI.hide("#gamespecific");
     $("#gameinfo").html("&nbsp;");
     $("#gameinfo").addClass("ingame");
@@ -1867,6 +2056,7 @@ UI.reconnection = function() {
     UI.resetPowerups(),
     UI.hideSpectator(),
     UI.wipeAllMinimapMobs(),
+    UI.resetGameLog(),
     UI.addChatSeparator(),
     UI.wipeAllMessages(),
     Games.wipe(),
@@ -1985,6 +2175,8 @@ UI.endDragChat = function(e) {
 };
 
 UI.setup = function() {
+    loadGameLogFilterState();
+
     if (config.settings.chatWidth && config.settings.chatHeight) {
         var w = Math.max(100, Math.min(700, config.settings.chatWidth));
         var h = Math.max(50, Math.min(500, config.settings.chatHeight));
@@ -2050,6 +2242,18 @@ UI.setup = function() {
     $("#scorecontainer").on("click", UI.onScoreboardClick),
     $("#scoredetailed").on("click", UI.onScoreboardClick),
     $("#gamespecific").on("click", UI.onScoreboardClick),
+    $("#gamelog-filter-kills").on("click", function(event) {
+        UI.toggleGameLogFilter("kills");
+        event.stopPropagation();
+    }),
+    $("#gamelog-filter-connections").on("click", function(event) {
+        UI.toggleGameLogFilter("connections");
+        event.stopPropagation();
+    }),
+    $("#gamelog-filter-captures").on("click", function(event) {
+        UI.toggleGameLogFilter("captures");
+        event.stopPropagation();
+    }),
     $("#invitefriends").on("click", function(e) {
         e.stopPropagation()
     }),
@@ -2114,6 +2318,7 @@ UI.setup = function() {
 
     UI.createScaleSlider();
     UI.hideScaleSlider();
+    renderGameLog();
 }
 
 

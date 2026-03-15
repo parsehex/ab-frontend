@@ -1142,6 +1142,147 @@ input:focus {
     background-image: url("air-battle_logo.png");
 }
 
+#gamelog-ui {
+    display: none;
+    position: absolute;
+    left: 126px;
+    top: 16px;
+    width: 344px;
+    z-index: 15;
+    pointer-events: none;
+}
+
+#gamelog-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: auto;
+}
+
+#gamelog-controls .gamelog-filter {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid rgba(182, 196, 220, 0.46);
+    border-radius: 5px;
+    background: linear-gradient(180deg, rgba(56, 62, 75, 0.56) 0%, rgba(34, 38, 47, 0.56) 100%);
+    color: rgba(226, 235, 247, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.12s;
+}
+
+#gamelog-controls .gamelog-filter:hover {
+    color: #fff;
+    border-color: rgba(208, 220, 244, 0.9);
+    transform: translateY(-1px);
+}
+
+#gamelog-controls .gamelog-filter.active {
+    color: #fff;
+    border-color: rgba(130, 196, 255, 0.82);
+    background: linear-gradient(180deg, rgba(42, 94, 136, 0.66) 0%, rgba(32, 69, 102, 0.66) 100%);
+}
+
+#gamelog-controls .gamelog-filter .icon {
+    width: 14px;
+    height: 14px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.78;
+}
+
+#gamelog-controls .gamelog-filter.active .icon,
+#gamelog-controls .gamelog-filter:hover .icon {
+    opacity: 1;
+}
+
+#gamelog-controls .gamelog-filter .icon-kills {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cg fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.35'%3E%3Ccircle cx='7' cy='7' r='3.4'/%3E%3Cpath d='M7 1.2v2M7 10.8v2M1.2 7h2M10.8 7h2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+#gamelog-controls .gamelog-filter .icon-connections {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cg fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.25'%3E%3Ccircle cx='3' cy='7' r='1.65'/%3E%3Ccircle cx='11' cy='4' r='1.65'/%3E%3Ccircle cx='11' cy='10' r='1.65'/%3E%3Cpath d='M4.5 6.25L9.3 4.7M4.5 7.75l4.8 1.55'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+#gamelog-controls .gamelog-filter .icon-captures {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cg fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.25'%3E%3Cpath d='M3.4 12V2.2M3.4 2.2h5.6l-1.2 2.15L9 6.5H3.4'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+#gamelog {
+    margin-top: 8px;
+    width: 336px;
+    max-height: 148px;
+    pointer-events: auto;
+    border-radius: 9px;
+    border: 1px solid rgba(190, 203, 224, 0.2);
+    background: linear-gradient(180deg, rgba(18, 24, 35, 0.56) 0%, rgba(12, 17, 26, 0.56) 100%);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(3px);
+}
+
+#gamelog-lines {
+    max-height: 148px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(133, 147, 172, 0.6) rgba(0, 0, 0, 0.1);
+}
+
+#gamelog-lines .entry {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 4px;
+    line-height: 1.3;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.45);
+    color: #dbe5f7;
+}
+
+#gamelog-lines .entry:last-child {
+    margin-bottom: 0;
+}
+
+#gamelog-lines .entry .ts {
+    font-size: 10px;
+    color: #95a4bf;
+    min-width: 58px;
+}
+
+#gamelog-lines .entry .text {
+    font-size: 12px;
+    color: #f3f7ff;
+    word-break: break-word;
+}
+
+#gamelog-lines .entry .text .name {
+    font-weight: 700;
+}
+
+#gamelog-lines .entry .text .name.team-blue {
+    color: #76a9ff;
+}
+
+#gamelog-lines .entry .text .name.team-red {
+    color: #ff8484;
+}
+
+#gamelog-lines .entry .text .name.spectating {
+    color: #9ca7be;
+}
+
+#gamelog-lines .empty {
+    font-size: 11px;
+    color: #8c9ab3;
+    text-align: center;
+    padding: 7px 0;
+}
+
 #menu {
     display: none;
     position: absolute;
@@ -4140,6 +4281,10 @@ only screen and (max-height:599px) and (orientation:landscape) {
         left: 58px
     }
 
+    #gamelog-ui {
+        display: none !important;
+    }
+
     #tooltip {
         -moz-transform: scale(.6);
         -webkit-transform: scale(.6);
@@ -4277,6 +4422,19 @@ only screen and (max-height:599px) and (orientation:landscape) {
         width: 20px;
         height: 15px;
         background-size: 20px auto
+    }
+}
+
+@media only screen and (max-width:1200px) and (min-width:600px) and (min-height:600px) {
+    #gamelog-ui {
+        -moz-transform: scale(.84);
+        -webkit-transform: scale(.84);
+        -o-transform: scale(.84);
+        transform: scale(.84);
+        -moz-transform-origin: left top;
+        -webkit-transform-origin: left top;
+        -o-transform-origin: left top;
+        transform-origin: left top;
     }
 }
 

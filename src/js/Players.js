@@ -30,6 +30,9 @@ Players.add = function(player, fromLogin) {
     playersById[player.id] = new Player(player, fromLogin);
 
     if (game.state === Network.STATE.PLAYING) {
+        if (!fromLogin) {
+            UI.logConnection(playersById[player.id], true);
+        }
         UI.updateGameInfo();
     }
 };
@@ -182,22 +185,23 @@ Players.kill = function(msg) {
     }
 
     if (msg.killer != 0 || msg.posX != 0 || msg.posY != 0) {
+        let killer = playersById[msg.killer];
         player.kill(msg);
+        UI.logKill(killer, player);
         if (player.me()) {
             UI.visibilityHUD(false);
-            let killer = playersById[msg.killer];
             if (killer) {
                 UI.killedBy(killer);
             }
             UI.showSpectator('<div onclick="Network.spectateNext()" class="spectate">ENTER SPECTATOR MODE</div>');
-        } 
+        }
         else if (msg.killer === game.myID) {
             UI.killed(player);
         }
         if (!player.me() && player.id === game.spectatingID && game.gameType !== GameType.BTR) {
             Games.spectatorSwitch(player.id);
         }
-    } 
+    }
     else {
         player.kill({
             posX: 0,
@@ -217,6 +221,9 @@ Players.destroy = function(id) {
 
     let player = playersById[id];
     if (player != null) {
+        if (game.state === Network.STATE.PLAYING) {
+            UI.logConnection(player, false);
+        }
         player.destroy(true);
         delete playersById[id];
 
