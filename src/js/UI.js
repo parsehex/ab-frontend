@@ -112,6 +112,67 @@ var gameLogLabelByType = {
     captures: "CAPTURE"
 };
 
+var logoModeClassPrefix = "logo-mode-";
+var validLogoModes = {
+    airbattle: true,
+    airmash: true
+};
+var pageTitleByLogoMode = {
+    airbattle: "\u039bIR-B\u039bTTLE",
+    airmash: "\u039bIRM\u039bSH"
+};
+
+var normalizeLogoMode = function(mode) {
+    if ("string" !== typeof mode) {
+        return null;
+    }
+
+    var normalized = mode.toLowerCase().trim();
+    return validLogoModes[normalized] ? normalized : null;
+};
+
+var forcedLogoMode = normalizeLogoMode(import.meta.env.VITE_FORCED_LOGO_MODE);
+
+var getActiveLogoMode = function() {
+    return forcedLogoMode || normalizeLogoMode(config.settings.logoMode) || "airbattle";
+};
+
+var applyLogoMode = function(mode, shouldPersist) {
+    var activeMode = forcedLogoMode || normalizeLogoMode(mode) || "airbattle";
+    var body = $("body");
+    var button = $("#logo-mode-toggle");
+    var nextMode = "airbattle" === activeMode ? "airmash" : "airbattle";
+
+    body.removeClass(logoModeClassPrefix + "airbattle " + logoModeClassPrefix + "airmash");
+    body.addClass(logoModeClassPrefix + activeMode);
+    document.title = pageTitleByLogoMode[activeMode] || pageTitleByLogoMode.airbattle;
+
+    if (!button.length) {
+        return;
+    }
+
+    button.removeClass("mode-airbattle mode-airmash");
+    button.addClass("mode-" + activeMode);
+    button.toggleClass("is-forced", !!forcedLogoMode);
+    button.prop("disabled", !!forcedLogoMode);
+    button.attr("title", forcedLogoMode ? "Logo mode forced by build" : ("Switch to " + ("airmash" === nextMode ? "Airmash" : "Air-Battle")));
+
+    if (shouldPersist && !forcedLogoMode && config.settings.logoMode !== activeMode) {
+        Tools.setSettings({
+            logoMode: activeMode
+        });
+    }
+};
+
+UI.toggleLogoMode = function() {
+    if (forcedLogoMode) {
+        return;
+    }
+
+    var nextMode = getActiveLogoMode() === "airbattle" ? "airmash" : "airbattle";
+    applyLogoMode(nextMode, true);
+};
+
 var getGameLogPlayerClassName = function(player) {
     if (!player) {
         return "";
@@ -2176,6 +2237,7 @@ UI.endDragChat = function(e) {
 
 UI.setup = function() {
     loadGameLogFilterState();
+    applyLogoMode(getActiveLogoMode(), false);
 
     if (config.settings.chatWidth && config.settings.chatHeight) {
         var w = Math.max(100, Math.min(700, config.settings.chatWidth));
@@ -2195,6 +2257,10 @@ UI.setup = function() {
     $(window).on("focus", Input.gameFocus),
     $(window).on("blur", Input.gameBlur),
     $(window).on("click", UI.popMenu),
+    $("#logo-mode-toggle").on("click", function(event) {
+        UI.toggleLogoMode();
+        event.stopPropagation();
+    }),
     $("#minimizechat").on("click", UI.minimizeChat),
     $("#maximizechat").on("click", UI.maximizeChat),
     $("#viewscore").on("click", function(e) {

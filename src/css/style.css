@@ -147,6 +147,62 @@ input:focus {
     cursor: default;
 }
 
+#logon #logo-mode-toggle {
+    width: 88px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 17px;
+    background: linear-gradient(180deg, rgba(72, 82, 103, 0.68) 0%, rgba(33, 38, 50, 0.68) 100%);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    padding: 0;
+    cursor: pointer;
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+#logon #logo-mode-toggle .logo-preview {
+    display: block;
+    margin: auto;
+    width: 66px;
+    height: 14px;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-image: url("airmash_logo.png");
+    opacity: 0.95;
+}
+
+#logon #logo-mode-toggle.mode-airbattle .logo-preview {
+    background-image: url("airmash_logo.png");
+}
+
+#logon #logo-mode-toggle.mode-airmash .logo-preview {
+    background-image: url("air-battle_logo.png");
+}
+
+#logon #logo-mode-toggle:hover {
+    border-color: rgba(143, 181, 255, 0.76);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+    transform: translateY(-1px);
+}
+
+#logon #logo-mode-toggle.is-forced {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#logon #logo-mode-toggle.is-forced:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    transform: none;
+}
+
+body.logo-mode-airmash #logon .logo {
+    background-image: url("airmash_logo.png");
+}
+
+body.logo-mode-airbattle #logon .logo {
+    background-image: url("air-battle_logo.png");
+}
+
 #logon .logo .version {
     position: absolute;
     left: 210px;
@@ -459,6 +515,10 @@ input:focus {
 }
 
 #logon .buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     text-align: center;
     margin-top: 24px;
 }
@@ -1139,6 +1199,14 @@ input:focus {
     height: 30px;
     background-repeat: no-repeat;
     background-size: 100% auto;
+    background-image: url("air-battle_logo.png");
+}
+
+body.logo-mode-airmash #logosmall {
+    background-image: url("airmash_logo.png");
+}
+
+body.logo-mode-airbattle #logosmall {
     background-image: url("air-battle_logo.png");
 }
 
