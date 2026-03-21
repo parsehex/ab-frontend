@@ -855,6 +855,29 @@ UI.parseCommand = function(chatInput) {
         UI.addChatMessage("Emotes available: /tf /pepe /clap /lol /bro /kappa /cry /rage", true);
     } else if("help" === command) {
         UI.toggleHelp();
+    } else if ("mash" === command) {
+        if (forcedLogoMode) {
+            UI.addChatMessage("Logo mode is forced to: " + forcedLogoMode, true);
+            return true;
+        }
+
+        var modeArg = words.length > 1 ? words[1].toLowerCase() : "";
+        var selectedMode = null;
+
+        if ("" === modeArg) {
+            UI.toggleLogoMode();
+            selectedMode = getActiveLogoMode();
+        } else if ("on" === modeArg || "airmash" === modeArg || "am" === modeArg) {
+            applyLogoMode("airmash", true);
+            selectedMode = "airmash";
+        } else if ("off" === modeArg || "airbattle" === modeArg || "ab" === modeArg) {
+            applyLogoMode("airbattle", true);
+            selectedMode = "airbattle";
+        } else {
+            UI.addChatMessage("Usage: /mash [on|off|airmash|airbattle]", true);
+            return true;
+        }
+
     } else if(!("debug" === command)) {
         if(UI.isEmote(command)) {
             Network.sendSay(":" + command + ":");
