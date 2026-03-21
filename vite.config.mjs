@@ -2,15 +2,6 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
-const cacheBustKey = process.env.AB_CACHE_BUST || Date.now().toString();
-
-function addCacheBustToHtml(content) {
-  return content.replace(
-    /(assets\/(?:flags\.css|style\.css|extra\.js|engine\.js))(?:\?v=[^"']*)?/g,
-    `$1?v=${cacheBustKey}`,
-  );
-}
-
 function removeStyleEntryJs() {
   return {
     name: 'remove-style-entry-js',
@@ -60,14 +51,9 @@ export default defineConfig({
     removeStyleEntryJs(),
     viteStaticCopy({
       targets: [
-        // TODO: -sigh- update these to hookup the name swapping
         { src: 'src/assets/*', dest: 'assets' },
         { src: 'src/robots.txt', dest: '.' },
-        {
-          src: 'src/html/index.html',
-          dest: '.',
-          transform: (content) => addCacheBustToHtml(content.toString()),
-        },
+        { src: 'src/html/index.html', dest: '.' },
         { src: 'src/html/privacy.html', dest: '.' },
         { src: 'src/html/contact.html', dest: '.' },
       ],
