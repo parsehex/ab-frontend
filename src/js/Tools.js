@@ -7,50 +7,272 @@ var bucketState = {},
     clientErrorCount = 0,
     reelState = {
         started: false,
-        startX: 200,
-        startY: -2450,
-        pan: 0,
-        dist: 100,
+        cameraX: 1686,
+        cameraY: -2564,
+        flyby: 0,
+        speed: 5,
+        startDistance: 2600,
+        endDistance: 2600,
         explosion: 4e3,
-        direction: 1
+        players: [],
+        leadByTeam: {
+            1: null,
+            2: null
+        },
+        ctfFlags: null,
+        infernoMarker: null
     },
     lastRemoteSettingsJson = "";
 
-Tools.updateReel = function() {
-    if (!reelState.started) {
-        reelState.pos = Vector.zero();
-        for (var e, t = [3, 1, 2, 4, 5], r = [-270, -150, 0, 150, 270], i = 0; i < t.length; i++)
-            Players.add({
-                id: i + 1,
-                team: 1,
+var randomReelFormation = function() {
+    var shipTypes = [1, 2, 3, 4, 5];
+    var shuffleShipTypes = function() {
+        var shuffled = shipTypes.slice();
+        for (var i = shuffled.length - 1; i > 0; i--) {
+            var j = Tools.randInt(0, i);
+            var temp = shuffled[i];
+            shuffled[i] = shuffled[j];
+            shuffled[j] = temp;
+        }
+        return shuffled;
+    };
+
+    var teamLeft = Tools.randInt(0, 1) === 0 ? 1 : 2;
+    var teamRight = teamLeft === 1 ? 2 : 1;
+    return {
+        left: {
+            team: teamLeft,
+            types: shuffleShipTypes()
+        },
+        right: {
+            team: teamRight,
+            types: shuffleShipTypes()
+        }
+    };
+};
+
+var initReelCTFFlags = function() {
+    reelState.ctfFlags = {
+        red: {
+            sprite: Textures.init("ctfFlagRed", {
+                visible: true
+            }),
+            shadow: Textures.init("ctfFlagShadow", {
+                visible: true
+            }),
+            carrierTeam: 2,
+            carrierId: null,
+            diffX: 0,
+            momentum: 0,
+            direction: 1
+        },
+        blue: {
+            sprite: Textures.init("ctfFlagBlue", {
+                visible: true
+            }),
+            shadow: Textures.init("ctfFlagShadow", {
+                visible: true
+            }),
+            carrierTeam: 1,
+            carrierId: null,
+            diffX: 0,
+            momentum: 0,
+            direction: -1
+        }
+    };
+};
+
+var initReelInfernoMarker = function() {
+    reelState.infernoMarker = {
+        x: 920,
+        y: -2800,
+        scale: 0.33,
+        padScale: 0.4,
+        shadowScale: 0.33 * (2.4 / config.shadowScaling),
+        randomness: Tools.rand(0, 1e5),
+        pad: Textures.init("infernoPad", {
+            scale: 0.4,
+            alpha: 0.95,
+            visible: true
+        }),
+        sprite: Textures.init("crateRampage", {
+            scale: 0.33,
+            visible: true
+        }),
+        shadow: Textures.init("crateShadow", {
+            scale: 0.33 * (2.4 / config.shadowScaling),
+            visible: true
+        })
+    };
+};
+
+var updateReelInfernoMarker = function() {
+    if (!reelState.infernoMarker) {
+        return;
+    }
+    var marker = reelState.infernoMarker;
+    marker.pad.position.set(marker.x, marker.y);
+    marker.pad.scale.set(marker.padScale, marker.padScale);
+    marker.sprite.position.set(marker.x, marker.y);
+    marker.sprite.scale.set(marker.scale, marker.scale);
+    var shadow = Graphics.shadowCoords(new Vector(marker.x, marker.y));
+    marker.shadow.position.set(shadow.x, shadow.y);
+    marker.shadow.scale.set(marker.shadowScale, marker.shadowScale);
+};
+
+var updateReelCTFFlag = function(flagData) {
+    if (!flagData || !reelState.leadByTeam[flagData.carrierTeam]) {
+        return;
+    }
+    var carrier = Players.get(reelState.leadByTeam[flagData.carrierTeam]);
+    if (!carrier) {
+        return;
+    }
+
+    var isNewCarrier = flagData.carrierId !== carrier.id;
+    if (isNewCarrier) {
+        flagData.carrierId = carrier.id;
+        flagData.diffX = carrier.pos.x;
+        flagData.momentum = 0;
+        flagData.direction = carrier.team === 1 ? 1 : -1;
+    }
+
+    flagData.sprite.position.set(carrier.pos.x, carrier.pos.y);
+    var shadow = Graphics.shadowCoords(carrier.pos);
+    flagData.shadow.position.set(shadow.x, shadow.y);
+
+    flagData.momentum = Tools.clamp(flagData.momentum + (carrier.pos.x - flagData.diffX) * game.timeFactor, -40, 40);
+    if (Math.abs(flagData.momentum) > 7) {
+        flagData.direction = flagData.momentum > 0 ? 1 : -1;
+    }
+
+    flagData.sprite.scale.set(0.4 * flagData.direction, 0.4);
+    flagData.shadow.scale.set(0.44 * flagData.direction, 0.44);
+    var rotation = 0.04 * -(carrier.pos.x - flagData.diffX) * game.timeFactor;
+    flagData.sprite.rotation = rotation;
+    flagData.shadow.rotation = rotation;
+    flagData.diffX = carrier.pos.x;
+};
+
+var buildReelPlayers = function() {
+    var formation = randomReelFormation();
+    var spreadPatterns = [
+        [0, -46, 46, -92, 92],
+        [0, -36, 36, -78, 78],
+        [0, -58, 58, -106, 106]
+    ];
+    var randomSpread = spreadPatterns[Tools.randInt(0, spreadPatterns.length - 1)];
+    var leftSlots = [
+        {x: 180, y: randomSpread[0]},
+        {x: 75, y: randomSpread[1]},
+        {x: 75, y: randomSpread[2]},
+        {x: -30, y: randomSpread[3]},
+        {x: -30, y: randomSpread[4]}
+    ];
+    var rightSlots = [
+        {x: -180, y: randomSpread[0]},
+        {x: -75, y: randomSpread[1]},
+        {x: -75, y: randomSpread[2]},
+        {x: 30, y: randomSpread[3]},
+        {x: 30, y: randomSpread[4]}
+    ];
+
+    reelState.players = [];
+    reelState.leadByTeam[1] = null;
+    reelState.leadByTeam[2] = null;
+    reelState.flyby = 0;
+
+    var id = 1;
+    var side, i;
+    for (side of [
+        {
+            info: formation.left,
+            direction: 1,
+            slots: leftSlots,
+            leadSlotX: 180,
+            homeY: -1915
+        },
+        {
+            info: formation.right,
+            direction: -1,
+            slots: rightSlots,
+            leadSlotX: -180,
+            homeY: -3023
+        }
+    ]) {
+        for (i = 0; i < side.info.types.length; i++) {
+            var slot = side.slots[i];
+            var playerData = {
+                id: id,
+                team: side.info.team,
                 status: 0,
                 reel: true,
                 name: "",
-                type: t[i],
+                type: side.info.types[i],
                 posX: 0,
                 posY: 0,
                 rot: 0,
                 flag: 1
-            }),
-            (e = Players.get(i + 1)).keystate.UP = true,
-            e._offset = r[i]
+            };
+            Players.add(playerData);
+
+            var player = Players.get(id);
+            player.keystate.UP = true;
+            player._groupDirection = side.direction;
+            player._slotX = slot.x;
+            player._slotY = slot.y;
+            player._homeY = side.homeY;
+
+            if (slot.x === side.leadSlotX) {
+                reelState.leadByTeam[side.info.team] = id;
+            }
+
+            reelState.players.push(id);
+            id++;
+        }
     }
-    reelState.started = true,
-    reelState.dist > 2e3 ? reelState.direction = -1 : reelState.dist < 100 && (reelState.direction = 1),
-    reelState.dist += .5 * reelState.direction * game.timeFactor,
-    reelState.pan += 1 / reelState.dist * game.timeFactor,
-    reelState.pos.x = reelState.startX + Math.sin(reelState.pan) * reelState.dist,
-    reelState.pos.y = reelState.startY - Math.cos(reelState.pan) * reelState.dist,
-    Graphics.setCamera(reelState.pos.x, reelState.pos.y),
-    Players.update(),
+};
+
+Tools.updateReel = function() {
+    if (!reelState.started) {
+        buildReelPlayers();
+        initReelCTFFlags();
+        initReelInfernoMarker();
+    }
+    reelState.started = true;
+    var totalTravel = reelState.startDistance + reelState.endDistance;
+    reelState.flyby += reelState.speed * game.timeFactor;
+    var flybyWrapped = false;
+    if (reelState.flyby > totalTravel) {
+        reelState.flyby = 0;
+        flybyWrapped = true;
+    }
+
+    Graphics.setCamera(reelState.cameraX, reelState.cameraY);
+    for (var o, i = 0; i < reelState.players.length; i++) {
+        o = Players.get(reelState.players[i]);
+        if (!o) {
+            continue;
+        }
+        var groupBaseX = reelState.cameraX + o._groupDirection * (reelState.startDistance - reelState.flyby);
+        o.pos.x = groupBaseX + o._slotX;
+        o.pos.y = o._homeY + o._slotY;
+        if (flybyWrapped || null == o._prevPos) {
+            o._prevPos = o.pos.clone();
+            o.rot = o._groupDirection > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
+        } else {
+            o.rot = new Vector(o.pos.x - o._prevPos.x,o.pos.y - o._prevPos.y).angle() + Math.PI;
+            o._prevPos = new Vector((19 * o._prevPos.x + o.pos.x) / 20,(19 * o._prevPos.y + o.pos.y) / 20);
+        }
+    }
+
+    Players.update();
     Particles.update();
-    for (var o, s = 1; s <= 5; s++)
-        (o = Players.get(s)).pos.x = reelState.pos.x + o._offset,
-        o.pos.y = reelState.pos.y + game.screenY / game.scale * .24,
-        null != o._prevPos ? o.rot = new Vector(o.pos.x - o._prevPos.x,o.pos.y - o._prevPos.y).angle() + Math.PI : o._prevPos = o.pos.clone(),
-        o._prevPos = new Vector((19 * o._prevPos.x + o.pos.x) / 20,(19 * o._prevPos.y + o.pos.y) / 20);
+    updateReelInfernoMarker();
+    reelState.ctfFlags && (updateReelCTFFlag(reelState.ctfFlags.red),
+    updateReelCTFFlag(reelState.ctfFlags.blue));
     if (game.time > reelState.explosion) {
-        var a = new Vector(Tools.rand(reelState.pos.x - game.halfScreenX / game.scale, reelState.pos.x + game.halfScreenX / game.scale),Tools.rand(reelState.pos.y - game.halfScreenY / game.scale, reelState.pos.y + game.halfScreenY / game.scale));
+        var a = new Vector(Tools.rand(reelState.cameraX - game.halfScreenX / game.scale, reelState.cameraX + game.halfScreenX / game.scale),Tools.rand(reelState.cameraY - game.halfScreenY / game.scale, reelState.cameraY + game.halfScreenY / game.scale));
         Particles.explosion(a, Tools.rand(2, 2.5), Tools.randInt(4, 7)),
         Particles.explosion(new Vector(a.x + Tools.rand(-100, 100),a.y + Tools.rand(-100, 100)), Tools.rand(1, 1.2)),
         reelState.explosion = game.time + Tools.rand(1e3, 3e3)
@@ -58,6 +280,31 @@ Tools.updateReel = function() {
 };
 
 Tools.wipeReel = function() {
+    if (reelState.ctfFlags) {
+        for (var flagName of ["red", "blue"]) {
+            var reelFlag = reelState.ctfFlags[flagName];
+            if (reelFlag) {
+                game.graphics.layers.flags.removeChild(reelFlag.sprite);
+                game.graphics.layers.shadows.removeChild(reelFlag.shadow);
+                reelFlag.sprite.destroy();
+                reelFlag.shadow.destroy();
+            }
+        }
+        reelState.ctfFlags = null;
+    }
+    if (reelState.infernoMarker) {
+        game.graphics.layers.crates.removeChild(reelState.infernoMarker.pad);
+        game.graphics.layers.crates.removeChild(reelState.infernoMarker.sprite);
+        game.graphics.layers.shadows.removeChild(reelState.infernoMarker.shadow);
+        reelState.infernoMarker.pad.destroy();
+        reelState.infernoMarker.sprite.destroy();
+        reelState.infernoMarker.shadow.destroy();
+        reelState.infernoMarker = null;
+    }
+    reelState.players = [];
+    reelState.leadByTeam[1] = null;
+    reelState.leadByTeam[2] = null;
+    reelState.started = false;
     Particles.wipe(),
     Players.wipe()
 };
@@ -192,7 +439,7 @@ Tools.wipeSettings = function() {
 
 var checkAuth = function() {
     if (undefined === config.auth.tokens ||
-        undefined === config.auth.tokens.settings || 
+        undefined === config.auth.tokens.settings ||
         undefined === config.auth.tokens.game ||
         undefined === config.auth.identityprovider ||
         undefined === config.auth.loginname) {

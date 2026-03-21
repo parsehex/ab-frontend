@@ -2440,6 +2440,9 @@ UI.onScaleKnobMouseDown = function(event) {
 };
 
 UI.getScalingFactor = function() {
+    if (window.game && game.state === Network.STATE.LOGIN) {
+        return config.scalingFactor * 2;
+    }
     if(config.settings.scalingAltMode) {
         return UI.capScalingFactor(config.settings.altScalingFactor || config.altScalingFactor);
     } else {

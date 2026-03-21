@@ -83,6 +83,7 @@ var spriteByName = {
     spark_2: ["particles", [864, 120, 8, 8]],
     spark_1: ["particles", [872, 120, 8, 8]],
     flash_2: ["particles", [848, 0, 120, 120]],
+    inferno_pad: ["items", [4, 4, 256, 256]],
     crate_upgrade: ["items", [4, 268, 128, 128]],
     crate_magic: ["items", [4, 409, 128, 128]],
     crate_shield: ["items", [140, 268, 128, 128]],
@@ -400,6 +401,11 @@ var textureByName = {
         layer: "glows",
         anchor: [0.5, 0.3],
         blend: "ADD"
+    },
+    infernoPad: {
+        texture: "inferno_pad",
+        layer: "crates",
+        anchor: [0.5, 0.5]
     },
     crateShadow: {
         texture: "crate_shadow",
