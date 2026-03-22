@@ -144,7 +144,7 @@ input:focus {
     background-repeat: no-repeat;
     background-size: 100% auto;
     background-image: url("air-battle_logo.png");
-    cursor: default;
+    cursor: pointer;
 }
 
 #logon #logo-mode-toggle {

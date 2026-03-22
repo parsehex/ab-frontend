@@ -125,6 +125,10 @@ var pageTitleByLogoMode = {
     airbattle: "\u039bIR-B\u039bTTLE",
     airmash: "\u039bIRM\u039bSH"
 };
+var logoLinkByMode = {
+    airbattle: "https://air-battle.net/",
+    airmash: "https://airmash.rocks/"
+};
 
 var normalizeLogoMode = function(mode) {
     if ("string" !== typeof mode) {
@@ -136,6 +140,16 @@ var normalizeLogoMode = function(mode) {
 };
 
 var forcedLogoMode = normalizeLogoMode(import.meta.env.VITE_FORCED_LOGO_MODE);
+
+var getLogoHrefByMode = function(mode) {
+    return logoLinkByMode[mode] || logoLinkByMode.airbattle;
+};
+
+var updateLogoLinks = function(mode) {
+    var href = getLogoHrefByMode(mode);
+    $("#logosmall").attr("href", href);
+    $("#join-logo-link").attr("href", href);
+};
 
 var getActiveLogoMode = function() {
     return forcedLogoMode || normalizeLogoMode(config.settings.logoMode) || "airbattle";
@@ -150,6 +164,7 @@ var applyLogoMode = function(mode, shouldPersist) {
     body.removeClass(logoModeClassPrefix + "airbattle " + logoModeClassPrefix + "airmash");
     body.addClass(logoModeClassPrefix + activeMode);
     document.title = pageTitleByLogoMode[activeMode] || pageTitleByLogoMode.airbattle;
+    updateLogoLinks(activeMode);
 
     if (!button.length) {
         return;
@@ -2422,6 +2437,9 @@ UI.setup = function() {
     $(window).on("focus", Input.gameFocus),
     $(window).on("blur", Input.gameBlur),
     $(window).on("click", UI.popMenu),
+    $("#join-logo-link").on("click", function(e) {
+        e.stopPropagation();
+    }),
     $("#logo-mode-toggle").on("click", function(event) {
         UI.toggleLogoMode();
         event.stopPropagation();
