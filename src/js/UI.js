@@ -147,8 +147,13 @@ var getLogoHrefByMode = function(mode) {
 
 var updateLogoLinks = function(mode) {
     var href = getLogoHrefByMode(mode);
-    $("#logosmall").attr("href", href);
     $("#join-logo-link").attr("href", href);
+
+    if (window && window.location && window.location.origin) {
+        $("#logosmall").attr("href", window.location.origin + "/");
+    } else {
+        $("#logosmall").attr("href", "/");
+    }
 };
 
 var getActiveLogoMode = function() {
@@ -1043,7 +1048,8 @@ var renderChatStatus = function() {
     var html = "";
     for (var i = 0; i < statusKeys.length; i++) {
         var entry = chatStatusEntries[statusKeys[i]];
-        html += '<div class="status-pill ' + entry.variant + '" title="' + UI.escapeHTML(entry.title || entry.label + ': ' + entry.value) + '"><span class="label">' + UI.escapeHTML(entry.label) + '</span><span class="value">' + UI.escapeHTML(entry.value) + '</span></div>';
+        const valueHtml = '<span class="value">' + UI.escapeHTML(entry.value) + '</span>';
+        html += '<div class="status-pill ' + entry.variant + '" title="' + UI.escapeHTML(entry.title || entry.label + ': ' + entry.value) + '"><span class="label">' + UI.escapeHTML(entry.label) + `</span>${entry.value ? valueHtml : ''}</div>`;
     }
 
     $("#chatstatus").html(html);
@@ -1085,8 +1091,8 @@ var getServerChatStatusUpdate = function(msg, text) {
         Graphics.renderCTFSpawnLines();
         return {
             key: "fever",
-            label: "Fever",
-            value: "On",
+            label: "Upg Fever",
+            value: "",
             variant: "active",
             title: "Upgrades fever event is ongoing"
         };
