@@ -978,6 +978,91 @@ body.logo-mode-airbattle #logon .logo {
     transition: .25s background-color linear;
 }
 
+#chatstatus {
+    display: none;
+    position: absolute;
+    left: 10px;
+    bottom: 178px;
+    width: 25%;
+    min-width: 330px;
+    max-width: 800px;
+    box-sizing: border-box;
+    padding: 0 2px;
+    cursor: default;
+}
+
+#chatstatus .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 6px 6px 0;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #d5d5d5;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    line-height: 1;
+}
+
+#chatstatus .status-pill .label {
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+#chatstatus .status-pill .value {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+#chatstatus .status-pill.active {
+    background-color: rgba(38, 84, 44, 0.68);
+    border-color: rgba(116, 197, 122, 0.35);
+}
+
+#chatstatus .status-pill.active .value {
+    color: #a4eba7;
+}
+
+#chatstatus .status-pill.inactive {
+    background-color: rgba(52, 52, 52, 0.68);
+    border-color: rgba(145, 145, 145, 0.28);
+}
+
+#chatstatus .status-pill.inactive .value {
+    color: #bebebe;
+}
+
+#chatstatus .status-pill.notice {
+    background-color: rgba(55, 76, 34, 0.72);
+    border-color: rgba(163, 205, 88, 0.34);
+}
+
+#chatstatus .status-pill.notice .value {
+    color: #d7ed9a;
+}
+
+#chatstatus .status-pill.warning {
+    background-color: rgba(92, 74, 30, 0.72);
+    border-color: rgba(213, 179, 90, 0.34);
+}
+
+#chatstatus .status-pill.warning .value {
+    color: #f0d58d;
+}
+
+#chatstatus .status-pill.info {
+    background-color: rgba(37, 55, 75, 0.72);
+    border-color: rgba(102, 150, 212, 0.34);
+}
+
+#chatstatus .status-pill.info .value {
+    color: #a9c8f0;
+}
+
 #chatbox .line {
     margin-bottom: 4px;
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
@@ -1148,7 +1233,7 @@ body.logo-mode-airbattle #logon .logo {
     max-width: 788px;
     position: absolute;
     left: 10px;
-    bottom: 180px;
+    bottom: 208px;
     height: 30px;
     background-color: rgba(0, 0, 0, 0.5);
     color: #dcdcdc;
@@ -4340,6 +4425,10 @@ only screen and (max-height:599px) and (orientation:landscape) {
         -o-transform-origin: left bottom;
         transform-origin: left bottom;
         top: calc(50% - 246px)
+    }
+
+    #chatstatus {
+        left: 58px
     }
 
     #chatbox {

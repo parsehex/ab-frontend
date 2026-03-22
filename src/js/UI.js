@@ -21,6 +21,8 @@ var minimapMobs = {},
     tooltipId = 0,
     isInviteVisible = false,
     isLoginVisible = false,
+    chatStatusEntries = {},
+    chatStatusTimerByKey = {},
     applyPowerupTimer = null,
     isSpectating = false,
     lastPrivateMessage = null,
@@ -105,6 +107,8 @@ var minimapMobs = {},
         captures: true
     },
     gameLogMaxEntries = 80;
+
+var CHAT_STATUS_ORDER = ["fever", "superuser", "round", "spectate"];
 
 var gameLogLabelByType = {
     kills: "KILL",
@@ -905,14 +909,17 @@ UI.onChatlineClick = function(event)
 
 
 UI.addChatLine = function(msg, text, msgType) {
-    if (msg.name === 'Server' || msg.id === 0) {
-        if (text.indexOf('Upgrades fever started') !== -1 || text.indexOf('upgrades fever event is ongoing') !== -1) {
-            game.upgradesFever = true;
-            Graphics.renderCTFSpawnLines();
-        } else if (text.indexOf('Upgrades fever ended') !== -1) {
-            game.upgradesFever = false;
-            Graphics.renderCTFSpawnLines();
-        }
+    var chatStatusUpdate = getServerChatStatusUpdate(msg, text);
+    if (chatStatusUpdate) {
+        UI.setChatStatus(
+            chatStatusUpdate.key,
+            chatStatusUpdate.label,
+            chatStatusUpdate.value,
+            chatStatusUpdate.variant,
+            chatStatusUpdate.timeoutMs,
+            chatStatusUpdate.title
+        );
+        return;
     }
 
     // Infected mode uses teams 1 & 2
@@ -998,6 +1005,134 @@ UI.showChatLevel = function(e) {
     var t = null;
     2 == e ? t = "Type /flag XX where XX is the 2-letter ISO code of a country" : 3 == e ? t = "Emotes available: /tf /pepe /clap /lol /bro /kappa /cry /rage" : 4 == e && (t = "Flag Pack #1: communist confederate imperial rainbow jolly"),
     null != t && UI.addChatMessage(t, true)
+};
+
+var clearChatStatusTimer = function(key) {
+    if (chatStatusTimerByKey[key]) {
+        clearTimeout(chatStatusTimerByKey[key]);
+        chatStatusTimerByKey[key] = null;
+    }
+};
+
+var renderChatStatus = function() {
+    var statusKeys = CHAT_STATUS_ORDER.filter(function(key) {
+        return chatStatusEntries[key] != null;
+    });
+
+    if (!statusKeys.length || isChatMinimized) {
+        UI.hide("#chatstatus");
+        $("#chatstatus").html("");
+        return;
+    }
+
+    var html = "";
+    for (var i = 0; i < statusKeys.length; i++) {
+        var entry = chatStatusEntries[statusKeys[i]];
+        html += '<div class="status-pill ' + entry.variant + '" title="' + UI.escapeHTML(entry.title || entry.label + ': ' + entry.value) + '"><span class="label">' + UI.escapeHTML(entry.label) + '</span><span class="value">' + UI.escapeHTML(entry.value) + '</span></div>';
+    }
+
+    $("#chatstatus").html(html);
+    UI.show("#chatstatus");
+};
+
+UI.setChatStatus = function(key, label, value, variant, timeoutMs, title) {
+    clearChatStatusTimer(key);
+    chatStatusEntries[key] = {
+        label: label,
+        value: value,
+        variant: variant || "info",
+        title: title
+    };
+    renderChatStatus();
+
+    if (timeoutMs) {
+        chatStatusTimerByKey[key] = setTimeout(function() {
+            delete chatStatusEntries[key];
+            chatStatusTimerByKey[key] = null;
+            renderChatStatus();
+        }, timeoutMs);
+    }
+};
+
+UI.clearChatStatus = function(key) {
+    clearChatStatusTimer(key);
+    delete chatStatusEntries[key];
+    renderChatStatus();
+};
+
+var getServerChatStatusUpdate = function(msg, text) {
+    if (msg.name !== "Server" && msg.id !== 0) {
+        return null;
+    }
+
+    if (text.indexOf("Upgrades fever started") !== -1 || text.indexOf("upgrades fever event is ongoing") !== -1 || text.indexOf("An upgrades fever event is ongoing") !== -1) {
+        game.upgradesFever = true;
+        Graphics.renderCTFSpawnLines();
+        return {
+            key: "fever",
+            label: "Fever",
+            value: "On",
+            variant: "active",
+            title: "Upgrades fever event is ongoing"
+        };
+    }
+
+    if (text.indexOf("Upgrades fever ended") !== -1) {
+        game.upgradesFever = false;
+        Graphics.renderCTFSpawnLines();
+        return {
+            key: "fever",
+            label: "Fever",
+            value: "Off",
+            variant: "inactive",
+            title: "Upgrades fever event ended"
+        };
+    }
+
+    if (text === "You have superuser rights now.") {
+        return {
+            key: "superuser",
+            label: "SU",
+            value: "Enabled",
+            variant: "active",
+            title: text
+        };
+    }
+
+    if (text === "Switch to spectate mode if you are not going to play the next game or be on the map till reshuffle if you are.") {
+        return {
+            key: "spectate",
+            label: "Next",
+            value: "AFK -> spectate",
+            variant: "notice",
+            title: text,
+            timeoutMs: 2e4
+        };
+    }
+
+    if (text === "You were automatically switched to spectate mode (AFK).") {
+        return {
+            key: "spectate",
+            label: "AFK",
+            value: "Auto-spectate",
+            variant: "warning",
+            title: text,
+            timeoutMs: 15e3
+        };
+    }
+
+    var gameTimeMatch = /^Game time:\s*(.+?)\.?$/.exec(text);
+    if (gameTimeMatch) {
+        return {
+            key: "round",
+            label: "Round",
+            value: gameTimeMatch[1],
+            variant: "info",
+            title: text
+        };
+    }
+
+    return null;
 };
 
 /**
@@ -1395,6 +1530,7 @@ UI.minimizeChat = function(e) {
     isChatMinimized || (isChatBoxVisible && UI.toggleChatBox(),
     isChatMinimized = true,
     unreadMessageCount = 0,
+    UI.hide("#chatstatus"),
     UI.hide("#chatbox"),
     UI.hide("#chatunreadlines"),
     UI.show("#maximizechat"),
@@ -1407,6 +1543,7 @@ UI.maximizeChat = function() {
         UI.hide("#maximizechat"),
         UI.hide("#chatunreadlines"),
         UI.show("#chatbox");
+        renderChatStatus();
         var e = $("#chatbox");
         e.scrollTop(e[0].scrollHeight)
     }
@@ -2237,13 +2374,17 @@ UI.dragChat = function(e) {
             width: w + "px",
             height: h + "px"
         }),
+        $("#chatstatus").css({
+            width: w + "px",
+            bottom: h + 18 + "px"
+        }),
         $("#minimizechatcontainer").css({
             width: w + "px",
             bottom: h + "px"
         }),
         $("#chatinput").css({
             width: w - 12 + "px",
-            bottom: h + 20 + "px"
+            bottom: h + 48 + "px"
         })
     }
 };
@@ -2267,8 +2408,9 @@ UI.setup = function() {
         var h = Math.max(50, Math.min(500, config.settings.chatHeight));
 
         $("#chatbox").css({ width: w + "px", height: h + "px" });
+        $("#chatstatus").css({ width: w + "px", bottom: (h + 18) + "px" });
         $("#minimizechatcontainer").css({ width: w + "px", bottom: h + "px" });
-        $("#chatinput").css({ width: (w - 12) + "px", bottom: (h + 20) + "px" });
+        $("#chatinput").css({ width: (w - 12) + "px", bottom: (h + 48) + "px" });
     }
     $(window).resize(onWindowResize),
     $(window).on("orientationchange", onWindowResize),
