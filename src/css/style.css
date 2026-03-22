@@ -989,24 +989,35 @@ body.logo-mode-airbattle #logon .logo {
     box-sizing: border-box;
     padding: 0 2px;
     cursor: default;
+    text-align: right;
+}
+
+#chatstatus.align-left {
+    text-align: left;
 }
 
 #chatstatus .status-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin: 0 6px 6px 0;
+    margin: 0 0 6px 6px;
     padding: 4px 8px;
     border-radius: 999px;
-    background-color: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background-color: rgb(0, 0, 0);
+    opacity: 0.25;
+    border: 1px solid rgba(255, 255, 255, 0.11);
     color: #d5d5d5;
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
     line-height: 1;
+    cursor: pointer;
+}
+
+#chatstatus.align-left .status-pill {
+    margin: 0 6px 6px 0;
 }
 
 #chatstatus .status-pill .label {
-    color: rgba(255, 255, 255, 0.58);
+    color: rgb(255, 255, 255);
     font-size: 10px;
     font-weight: bold;
     letter-spacing: .08em;
@@ -1019,8 +1030,9 @@ body.logo-mode-airbattle #logon .logo {
 }
 
 #chatstatus .status-pill.active {
-    background-color: rgba(38, 84, 44, 0.68);
-    border-color: rgba(116, 197, 122, 0.35);
+    background-color: rgb(38, 84, 44);
+    border-color: rgb(116, 197, 122);
+    opacity: 0.4;
 }
 
 #chatstatus .status-pill.active .value {
@@ -1028,8 +1040,8 @@ body.logo-mode-airbattle #logon .logo {
 }
 
 #chatstatus .status-pill.inactive {
-    background-color: rgba(52, 52, 52, 0.68);
-    border-color: rgba(145, 145, 145, 0.28);
+    background-color: rgb(52, 52, 52);
+    border-color: rgb(145, 145, 145);
 }
 
 #chatstatus .status-pill.inactive .value {
@@ -1037,8 +1049,8 @@ body.logo-mode-airbattle #logon .logo {
 }
 
 #chatstatus .status-pill.notice {
-    background-color: rgba(55, 76, 34, 0.72);
-    border-color: rgba(163, 205, 88, 0.34);
+    background-color: rgb(55, 76, 34);
+    border-color: rgb(163, 205, 88);
 }
 
 #chatstatus .status-pill.notice .value {
@@ -1046,8 +1058,8 @@ body.logo-mode-airbattle #logon .logo {
 }
 
 #chatstatus .status-pill.warning {
-    background-color: rgba(92, 74, 30, 0.72);
-    border-color: rgba(213, 179, 90, 0.34);
+    background-color: rgb(92, 74, 30);
+    border-color: rgb(213, 179, 90);
 }
 
 #chatstatus .status-pill.warning .value {
@@ -1055,8 +1067,8 @@ body.logo-mode-airbattle #logon .logo {
 }
 
 #chatstatus .status-pill.info {
-    background-color: rgba(37, 55, 75, 0.72);
-    border-color: rgba(102, 150, 212, 0.34);
+    background-color: rgb(37, 55, 75);
+    border-color: rgb(102, 150, 212);
 }
 
 #chatstatus .status-pill.info .value {

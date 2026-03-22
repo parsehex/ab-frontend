@@ -23,6 +23,7 @@ var minimapMobs = {},
     isLoginVisible = false,
     chatStatusEntries = {},
     chatStatusTimerByKey = {},
+    chatStatusAlign = "right",
     applyPowerupTimer = null,
     isSpectating = false,
     lastPrivateMessage = null,
@@ -1032,6 +1033,29 @@ var clearChatStatusTimer = function(key) {
         clearTimeout(chatStatusTimerByKey[key]);
         chatStatusTimerByKey[key] = null;
     }
+};
+
+var normalizeChatStatusAlign = function(align) {
+    return align === "left" ? "left" : "right";
+};
+
+var applyChatStatusAlign = function(align, shouldPersist) {
+    chatStatusAlign = normalizeChatStatusAlign(align);
+    var isLeft = chatStatusAlign === "left";
+    var chatStatus = $("#chatstatus");
+
+    chatStatus.toggleClass("align-left", isLeft);
+
+    if (shouldPersist && config.settings.chatStatusAlign !== chatStatusAlign) {
+        Tools.setSettings({
+            chatStatusAlign: chatStatusAlign
+        });
+    }
+};
+
+UI.toggleChatStatusAlign = function() {
+    var nextAlign = chatStatusAlign === "left" ? "right" : "left";
+    applyChatStatusAlign(nextAlign, true);
 };
 
 var renderChatStatus = function() {
@@ -2423,6 +2447,7 @@ UI.endDragChat = function(e) {
 UI.setup = function() {
     loadGameLogFilterState();
     applyLogoMode(getActiveLogoMode(), false);
+    applyChatStatusAlign(config.settings.chatStatusAlign, false);
 
     if (config.settings.chatWidth && config.settings.chatHeight) {
         var w = Math.max(100, Math.min(700, config.settings.chatWidth));
@@ -2443,6 +2468,10 @@ UI.setup = function() {
     $(window).on("focus", Input.gameFocus),
     $(window).on("blur", Input.gameBlur),
     $(window).on("click", UI.popMenu),
+    $("#chatstatus").on("click", ".status-pill", function(e) {
+        UI.toggleChatStatusAlign();
+        e.stopPropagation();
+    }),
     $("#join-logo-link").on("click", function(e) {
         e.stopPropagation();
     }),
