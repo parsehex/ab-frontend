@@ -31,11 +31,16 @@ export default defineConfig({
     rollupOptions: {
       input: {
         engine: path.resolve(__dirname, 'src/js/engine-entry.js'),
-        extra: path.resolve(__dirname, 'src/js/extra.js'),
         style: path.resolve(__dirname, 'src/css/style-entry.css'),
       },
       output: {
-        entryFileNames: 'assets/[name].js',
+        entryFileNames: (chunkInfo) => {
+          if (chunkInfo.name === 'engine') {
+            return 'assets/engine-[hash].js';
+          }
+
+          return 'assets/[name].js';
+        },
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css' || assetInfo.name === 'style-entry.css') {
