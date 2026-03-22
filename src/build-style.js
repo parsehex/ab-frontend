@@ -50,11 +50,11 @@ if (fs.existsSync(distFlagsCssPath)) {
   indexHtml = indexHtml.replace(/assets\/flags\.css(?:\?v=[A-Za-z0-9._-]+)?/g, `assets/flags.css?v=${flagsCssVersion}`);
 }
 
-const engineEntries = listMatchingDistAssets((name) => /^engine(?:-[A-Za-z0-9]+)?\.js$/.test(name));
+const engineEntries = listMatchingDistAssets((name) => /^engine(?:-[A-Za-z0-9_-]+)?\.js$/.test(name));
 if (engineEntries.length > 0) {
   const preferredEngineEntry = engineEntries.find((filePath) => path.basename(filePath).startsWith('engine-')) || engineEntries[0];
   const engineAssetName = path.basename(preferredEngineEntry);
-  indexHtml = indexHtml.replace(/assets\/engine(?:-[A-Za-z0-9]+)?\.js(?:\?v=[A-Za-z0-9._-]+)?/g, `assets/${engineAssetName}`);
+  indexHtml = indexHtml.replace(/assets\/engine(?:-[A-Za-z0-9_-]+)?\.js(?:\?v=[A-Za-z0-9._-]+)?/g, `assets/${engineAssetName}`);
 }
 
 fs.writeFileSync(distIndexHtmlPath, indexHtml);
