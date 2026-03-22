@@ -4,6 +4,8 @@ const crypto = require('crypto');
 
 const distCssPath = path.join(__dirname, '..', 'dist', 'assets', 'style.css');
 const distFlagsCssPath = path.join(__dirname, '..', 'dist', 'assets', 'flags.css');
+const distEngineJsPath = path.join(__dirname, '..', 'dist', 'assets', 'engine.js');
+const distExtraJsPath = path.join(__dirname, '..', 'dist', 'assets', 'extra.js');
 const distIndexHtmlPath = path.join(__dirname, '..', 'dist', 'index.html');
 
 if (!fs.existsSync(distCssPath)) {
@@ -37,5 +39,15 @@ if (fs.existsSync(distFlagsCssPath)) {
   indexHtml = indexHtml.replace(/assets\/flags\.css(?:\?v=[A-Za-z0-9._-]+)?/g, `assets/flags.css?v=${flagsCssVersion}`);
 }
 
+if (fs.existsSync(distEngineJsPath)) {
+  const engineJsVersion = cacheBusterForFile(distEngineJsPath);
+  indexHtml = indexHtml.replace(/assets\/engine\.js(?:\?v=[A-Za-z0-9._-]+)?/g, `assets/engine.js?v=${engineJsVersion}`);
+}
+
+if (fs.existsSync(distExtraJsPath)) {
+  const extraJsVersion = cacheBusterForFile(distExtraJsPath);
+  indexHtml = indexHtml.replace(/assets\/extra\.js(?:\?v=[A-Za-z0-9._-]+)?/g, `assets/extra.js?v=${extraJsVersion}`);
+}
+
 fs.writeFileSync(distIndexHtmlPath, indexHtml);
-console.log('Applied CSS cache-busting query params in dist/index.html');
+console.log('Applied CSS and JS cache-busting query params in dist/index.html');
